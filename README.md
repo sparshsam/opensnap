@@ -7,7 +7,8 @@ to your Desktop, and copy it to your clipboard — all in one click.
 
 ## Features
 
-- Compact pill-shaped floating widget (~130 × 42 px), draggable anywhere
+- Compact pill-shaped floating widget (~96 × 36 px), draggable anywhere  
+- Subtle drop shadow, clean capsule design  
 - Always-on-top
 - Full multi-monitor desktop capture
 - Saves to **Desktop** by default (configurable)
@@ -79,9 +80,10 @@ in the tray. Use the **Quit** tray item to fully exit.
 
 - [ ] Widget drags smoothly across the screen
 - [ ] Widget stays on top of all other windows
-- [ ] Click camera button → screenshot captured
+- [ ] Click right side (camera zone) → screenshot captured
+- [ ] Drag from non-camera zone works smoothly
 - [ ] Screenshot saved to Desktop as `screenshot-YYYY-MM-DD-HHmmss.png`
-- [ ] Toast "Saved • screenshot-…" appears on widget for ~2 s
+- [ ] Toast "✓ screenshot-…" appears on widget for ~2 s
 - [ ] Ctrl+V pastes the screenshot into an app (Paint, Word, chat)
 - [ ] Tray icon visible in system tray overflow area
 - [ ] Double-click tray icon → captures screenshot
@@ -93,6 +95,10 @@ in the tray. Use the **Quit** tray item to fully exit.
 - [ ] Widget position persists across restart
 - [ ] Widget clamped to visible area if monitor layout changed
 - [ ] Default save path is C:\Users\spars\Desktop
+- [ ] Widget renders correctly at 100%, 125%, and 150% Windows scaling
+- [ ] Drop shadow renders correctly on light and dark desktop backgrounds
+- [ ] App icon shows openshot camera icon in taskbar/tray/title bar
+- [ ] Camera icon on widget is crisp at all scaling levels
 
 ## Project Structure
 
