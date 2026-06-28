@@ -1,0 +1,92 @@
+<Window x:Class="OpenShot.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="OpenShot"
+        Width="240"
+        Height="52"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        ResizeMode="NoResize"
+        WindowStartupLocation="Manual"
+        Loaded="OnLoaded"
+        MouseLeftButtonDown="OnMouseDown">
+
+    <Border Background="#2D2D2D"
+            CornerRadius="8"
+            BorderBrush="#555555"
+            BorderThickness="1"
+            Padding="0">
+        <Grid Margin="6,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- App title / drag region -->
+            <StackPanel Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Margin="10,0,0,0"
+                        Cursor="Hand">
+                <TextBlock Text="OpenShot"
+                           Foreground="#CCCCCC"
+                           FontSize="11"
+                           FontFamily="Segoe UI, sans-serif" />
+                <TextBlock Text="Screenshot widget"
+                           Foreground="#888888"
+                           FontSize="9"
+                           FontFamily="Segoe UI, sans-serif"
+                           Margin="0,-1,0,0" />
+            </StackPanel>
+
+            <!-- Capture button -->
+            <Button x:Name="CaptureButton"
+                    Grid.Column="1"
+                    Content="Capture"
+                    Width="80"
+                    Height="30"
+                    Margin="0,0,8,0"
+                    VerticalAlignment="Center"
+                    FontFamily="Segoe UI, sans-serif"
+                    FontSize="12"
+                    FontWeight="SemiBold"
+                    Foreground="White"
+                    Background="#4A9EFF"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Click="OnCaptureClick">
+                <Button.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="border"
+                                            Background="{TemplateBinding Background}"
+                                            CornerRadius="6"
+                                            Padding="8,2">
+                                        <ContentPresenter HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="border"
+                                                    Property="Background"
+                                                    Value="#5AA8FF" />
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="border"
+                                                    Property="Background"
+                                                    Value="#3A88E0" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </Grid>
+    </Border>
+</Window>
