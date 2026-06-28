@@ -4,7 +4,8 @@ using System.Windows;
 namespace OpenShot;
 
 /// <summary>
-/// Application entry point. Owns settings, screenshot logic, and tray icon lifecycle.
+/// Application entry point. Owns settings, screenshot logic, tray lifecycle,
+/// and startup registration.
 /// </summary>
 public partial class App : System.Windows.Application
 {
@@ -21,10 +22,14 @@ public partial class App : System.Windows.Application
         // Load persisted settings
         _settings = AppSettings.Load();
 
+        // Sync startup registry to actual state (in case user manually deleted the key)
+        if (_settings.LaunchAtStartup != StartupManager.IsRegisteredForStartup())
+        {
+            StartupManager.SetStartup(_settings.LaunchAtStartup);
+        }
+
         // Create the floating widget window
         _widget = new MainWindow(_settings);
-        _widget.Top = _settings.WindowTop;
-        _widget.Left = _settings.WindowLeft;
         _widget.Topmost = _settings.AlwaysOnTop;
         _widget.Show();
 
@@ -33,7 +38,9 @@ public partial class App : System.Windows.Application
         _tray.CaptureRequested += OnCapture;
         _tray.OpenFolderRequested += OnOpenFolder;
         _tray.ChangeFolderRequested += OnChangeFolder;
+        _tray.StartupToggleRequested += OnStartupToggle;
         _tray.QuitRequested += OnQuit;
+        _tray.SetStartupChecked(_settings.LaunchAtStartup);
         _tray.Show();
 
         // Wire widget capture to same handler
@@ -43,7 +50,6 @@ public partial class App : System.Windows.Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        // Persist settings before shutting down
         if (_widget != null && _settings != null)
         {
             _settings.WindowLeft = _widget.Left;
@@ -70,12 +76,13 @@ public partial class App : System.Windows.Application
             var fullPath = Path.Combine(folder, fileName);
             ScreenshotService.SaveAsPng(bitmap, fullPath);
 
-            // Copy to clipboard
-            ScreenshotService.CopyToClipboard(bitmap);
+            // Copy to clipboard (with retries)
+            var clipboardOk = ScreenshotService.CopyToClipboard(bitmap);
 
             // Visual feedback
-            _tray?.Notify("OpenShot", $"Saved to {fileName}");
-            _widget?.FlashFeedback();  // brief visual pulse
+            _tray?.Notify("OpenShot", $"Saved  \u2022  {fileName}");
+            _widget?.FlashFeedback();
+            _widget?.ShowCaptureToast(fileName);
         }
         catch (Exception ex)
         {
@@ -110,6 +117,16 @@ public partial class App : System.Windows.Application
                 _settings.Save();
                 _tray?.Notify("OpenShot", $"Save folder changed to {dialog.SelectedPath}");
             }
+        }
+    }
+
+    private void OnStartupToggle(bool enabled)
+    {
+        StartupManager.SetStartup(enabled);
+        if (_settings != null)
+        {
+            _settings.LaunchAtStartup = enabled;
+            _settings.Save();
         }
     }
 

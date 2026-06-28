@@ -17,9 +17,10 @@ public sealed class AppSettings
     // ── Persisted fields ──────────────────────────────────────────────
 
     public string SavePath { get; set; } = GetDefaultSavePath();
-    public double WindowLeft { get; set; } = 100;
-    public double WindowTop { get; set; } = 100;
+    public double WindowLeft { get; set; } = -1;
+    public double WindowTop { get; set; } = -1;
     public bool AlwaysOnTop { get; set; } = true;
+    public bool LaunchAtStartup { get; set; } = false;
 
     // ── Serialisation ─────────────────────────────────────────────────
 
@@ -56,12 +57,16 @@ public sealed class AppSettings
 
     // ── Helpers ────────────────────────────────────────────────────────
 
+    /// <summary>
+    /// Default save path: C:\Users\&lt;user&gt;\Desktop
+    /// </summary>
     public static string GetDefaultSavePath()
     {
-        var pictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-        if (!string.IsNullOrEmpty(pictures))
-            return Path.Combine(pictures, "Screenshots", "OpenShot");
+        var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        if (!string.IsNullOrEmpty(desktop))
+            return desktop;
 
+        // Last-resort fallback
         return Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "OpenShot",

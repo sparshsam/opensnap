@@ -16,7 +16,6 @@ public static class ScreenshotService
     /// </summary>
     public static BitmapSource CaptureDesktop()
     {
-        // Bounding rectangle of all screens
         int left = SystemInformation.VirtualScreen.Left;
         int top = SystemInformation.VirtualScreen.Top;
         int width = SystemInformation.VirtualScreen.Width;
@@ -41,37 +40,30 @@ public static class ScreenshotService
         encoder.Save(stream);
     }
 
-    /// <summary>Copies a <see cref="BitmapSource"/> to the Windows clipboard.</summary>
-    public static void CopyToClipboard(BitmapSource source)
+    /// <summary>
+    /// Copies a <see cref="BitmapSource"/> to the Windows clipboard.
+    /// Retries up to 3 times with a short delay if the clipboard is locked.
+    /// </summary>
+    public static bool CopyToClipboard(BitmapSource source)
     {
-        try
-        {
-            System.Windows.Clipboard.SetImage(source);
-        }
-        catch (ExternalException)
-        {
-            // Clipboard may be locked by another process — suppress, don't crash.
-            // The user can still find the file on disk.
-        }
-    }
+        const int maxAttempts = 3;
 
-    // ── Private helpers ────────────────────────────────────────────────
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            try
+            {
+                System.Windows.Clipboard.SetImage(source);
+                return true;
+            }
+            catch (ExternalException)
+            {
+                // Clipboard locked by another process — retry after a short pause
+                if (attempt < maxAttempts)
+                    Thread.Sleep(100);
+            }
+        }
 
-    private static BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
-    {
-        var hBitmap = bitmap.GetHbitmap();
-        try
-        {
-            return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                hBitmap,
-                IntPtr.Zero,
-                Int32Rect.Empty,
-                BitmapSizeOptions.FromEmptyOptions());
-        }
-        finally
-        {
-            NativeMethods.DeleteObject(hBitmap);
-        }
+        return false;
     }
 
     /// <summary>Generates a timestamped filename: screenshot-yyyy-MM-dd-HHmmss.png</summary>
@@ -91,6 +83,23 @@ public static class ScreenshotService
     }
 
     // ── Native P/Invoke ────────────────────────────────────────────────
+
+    private static BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
+    {
+        var hBitmap = bitmap.GetHbitmap();
+        try
+        {
+            return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                hBitmap,
+                IntPtr.Zero,
+                Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
+        }
+        finally
+        {
+            NativeMethods.DeleteObject(hBitmap);
+        }
+    }
 
     private static class NativeMethods
     {

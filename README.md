@@ -2,74 +2,110 @@
 
 A minimal, always-on-top desktop screenshot widget for Windows.
 
-Click **Capture** to grab the full multi-monitor desktop, save it as PNG to a
-configurable folder, and copy it to your clipboard — all in one click.
+Click the camera icon to grab the full multi-monitor desktop, save it as PNG
+to your Desktop, and copy it to your clipboard — all in one click.
 
 ## Features
 
-- Borderless floating widget — draggable anywhere on screen
-- Always-on-top (configurable in settings)
+- Compact pill-shaped floating widget (~130 × 42 px), draggable anywhere
+- Always-on-top
 - Full multi-monitor desktop capture
-- Saves to `Pictures/Screenshots/OpenShot/` by default
+- Saves to **Desktop** by default (configurable)
 - Auto-generates filenames: `screenshot-yyyy-MM-dd-HHmmss.png`
-- Copies the captured image to clipboard automatically
-- System tray icon with context menu:
+- Copies to clipboard automatically (retries 3× if locked)
+- Toast feedback showing the saved filename
+- System tray icon (hidden in the taskbar overflow area) with context menu:
   - Capture
-  - Open screenshots folder
+  - Open Desktop folder
   - Change save folder…
+  - Launch at startup (toggle)
   - Quit
 - Settings persisted to `%APPDATA%/OpenShot/settings.json`
-- Visual flash feedback on capture
+- Startup position clamped to visible work area (handles monitor changes)
 - Error handling for missing folders, clipboard issues, capture failures
 
 ## Prerequisites
 
 - Windows 10 / 11
-- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) or later
-  (the **Desktop development with .NET** workload — Visual Studio or
-  `dotnet workload install`)
+- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) with
+  the **Desktop development with .NET** workload
 
-## Build & Run
+## Build
 
 ```cmd
-:: From the repository root
+cd C:\Users\spars\repos\openshot
 dotnet restore
 dotnet build -c Release
-dotnet run -c Release
 ```
 
-Or open the project folder in Visual Studio and press **F5**.
+## Publish (standalone exe)
 
-## Usage
-
-1. The widget appears as a small floating bar. Drag it by the title area to
-   reposition.
-2. Click **Capture** (or double-click the tray icon) to take a screenshot.
-3. The image is saved to the configured folder and copied to your clipboard —
-   paste it anywhere with Ctrl+V.
-4. Right-click the tray icon to change the save folder, open the folder, or quit.
-
-## Configuration
-
-Settings are stored at:
-
-```
-%APPDATA%\OpenShot\settings.json
+```cmd
+dotnet publish -c Release -r win-x64 --self-contained true ^
+  -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true ^
+  -o publish
 ```
 
-Fields: `SavePath`, `WindowLeft`, `WindowTop`, `AlwaysOnTop`.
+This produces a single `OpenShot.exe` in the `publish\` folder that can run on
+any Windows machine without the .NET runtime installed.
+
+## Install / Run
+
+1. **From source:**
+   ```cmd
+   dotnet run -c Release
+   ```
+
+2. **From published exe:**
+   Run `publish\OpenShot.exe` directly.
+
+A desktop shortcut to the published exe is created at:
+`C:\Users\spars\Desktop\OpenShot.lnk`
+
+## Startup behavior
+
+When **Launch at startup** is toggled on (via the tray menu), OpenShot
+registers itself under:
+
+```
+HKCU\Software\Microsoft\Windows\CurrentVersion\Run\OpenShot
+```
+
+The app starts automatically on Windows login. It lives in the system tray —
+the floating widget appears on screen; closing the widget keeps the app running
+in the tray. Use the **Quit** tray item to fully exit.
+
+## Test checklist
+
+- [ ] Widget drags smoothly across the screen
+- [ ] Widget stays on top of all other windows
+- [ ] Click camera button → screenshot captured
+- [ ] Screenshot saved to Desktop as `screenshot-YYYY-MM-DD-HHmmss.png`
+- [ ] Toast "Saved • screenshot-…" appears on widget for ~2 s
+- [ ] Ctrl+V pastes the screenshot into an app (Paint, Word, chat)
+- [ ] Tray icon visible in system tray overflow area
+- [ ] Double-click tray icon → captures screenshot
+- [ ] Tray menu → Capture works
+- [ ] Tray menu → Open Desktop folder opens Explorer
+- [ ] Tray menu → Change save folder persists across restarts
+- [ ] Tray menu → Launch at startup toggle (check Regedit)
+- [ ] Tray menu → Quit exits fully (no tray residue)
+- [ ] Widget position persists across restart
+- [ ] Widget clamped to visible area if monitor layout changed
+- [ ] Default save path is C:\Users\spars\Desktop
 
 ## Project Structure
 
 ```
 OpenShot/
-├── OpenShot.csproj        — .NET 8 Windows WPF project
-├── App.xaml / .cs         — Application entry point, lifecycle, tray wiring
-├── MainWindow.xaml / .cs  — Floating widget window
-├── AppSettings.cs         — JSON settings persistence
-├── ScreenshotService.cs   — Capture, save, clipboard logic
-├── TrayService.cs         — System tray icon + context menu
-├── Resources/app.ico      — Application icon
+├── OpenShot.csproj            — .NET 8 Windows WPF project
+├── App.xaml / .cs             — Entry point, lifecycle, tray wiring
+├── MainWindow.xaml / .cs      — Floating pill widget
+├── AppSettings.cs             — JSON settings persistence
+├── ScreenshotService.cs       — Capture, save, clipboard (with retry)
+├── StartupManager.cs          — Registry Run key management
+├── TrayService.cs             — System tray icon + context menu
+├── Resources/app.ico          — Application icon
 ├── README.md
 └── .gitignore
 ```
