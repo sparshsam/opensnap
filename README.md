@@ -2,19 +2,18 @@
 
 A minimal, always-on-top desktop screenshot widget for Windows.
 
-Click the camera icon to grab the full multi-monitor desktop, save it as PNG
+Click anywhere on the dark capsule to grab the full multi-monitor desktop, save it as PNG
 to your Desktop, and copy it to your clipboard — all in one click.
 
 ## Features
 
-- Compact pill-shaped floating widget (~96 × 36 px), draggable anywhere  
+- Compact dark capsule (~80 × 36 px), single unified action surface  
 - Subtle drop shadow, clean capsule design  
 - Always-on-top
 - Full multi-monitor desktop capture
 - Saves to **Desktop** by default (configurable)
 - Auto-generates filenames: `screenshot-yyyy-MM-dd-HHmmss.png`
 - Copies to clipboard automatically (retries 3× if locked)
-- Toast feedback showing the saved filename
 - System tray icon (hidden in the taskbar overflow area) with context menu:
   - Capture
   - Open Desktop folder
@@ -80,10 +79,9 @@ in the tray. Use the **Quit** tray item to fully exit.
 
 - [ ] Widget drags smoothly across the screen
 - [ ] Widget stays on top of all other windows
-- [ ] Click right side (camera zone) → screenshot captured
-- [ ] Drag from non-camera zone works smoothly
+- [ ] Click anywhere on the capsule → screenshot captured  
+- [ ] Drag smoothly from anywhere on the capsule  
 - [ ] Screenshot saved to Desktop as `screenshot-YYYY-MM-DD-HHmmss.png`
-- [ ] Toast "✓ screenshot-…" appears on widget for ~2 s
 - [ ] Ctrl+V pastes the screenshot into an app (Paint, Word, chat)
 - [ ] Tray icon visible in system tray overflow area
 - [ ] Double-click tray icon → captures screenshot
@@ -98,7 +96,7 @@ in the tray. Use the **Quit** tray item to fully exit.
 - [ ] Widget renders correctly at 100%, 125%, and 150% Windows scaling
 - [ ] Drop shadow renders correctly on light and dark desktop backgrounds
 - [ ] App icon shows openshot camera icon in taskbar/tray/title bar
-- [ ] Camera icon on widget is crisp at all scaling levels
+- [ ] Icon renders correctly on the widget at all scaling levels
 
 ## Project Structure
 

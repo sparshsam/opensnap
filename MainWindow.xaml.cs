@@ -6,12 +6,15 @@ using System.Windows.Media.Animation;
 namespace OpenShot;
 
 /// <summary>
-/// The floating borderless widget window — compact pill, always-on-top, draggable.
+/// The floating widget — unified dark capsule. Click anywhere to capture;
+/// drag anywhere to move. Threshold-based click-vs-drag detection.
 /// </summary>
 public partial class MainWindow : Window
 {
     private readonly AppSettings _settings;
-    private const double CaptureZoneWidth = 32;  // matches XAML
+    private System.Windows.Point _mouseDownPos;
+    private bool _isDragging;
+    private const double DragThreshold = 6; // px — click vs drag
 
     public event Action? CaptureRequested;
 
@@ -21,14 +24,11 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
-    // ── Window-level drag + click ─────────────────────────────────────
-
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         ClampToVisibleScreen();
     }
 
-    /// <summary>Clamp position to the primary screen's working area.</summary>
     private void ClampToVisibleScreen()
     {
         double x = _settings.WindowLeft >= 0 ? _settings.WindowLeft : 100;
@@ -44,68 +44,53 @@ public partial class MainWindow : Window
         Top = y;
     }
 
-    /// <summary>
-    /// Distinguish capture-click (right side) from drag (everywhere else).
-    /// </summary>
+    // ── Drag-vs-click ────────────────────────────────────────────────
+
     private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
         if (e.LeftButton != MouseButtonState.Pressed) return;
+        _mouseDownPos = e.GetPosition(this);
+        _isDragging = false;
+    }
+
+    private void OnPreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed || _isDragging) return;
 
         var pos = e.GetPosition(this);
+        var dx = pos.X - _mouseDownPos.X;
+        var dy = pos.Y - _mouseDownPos.Y;
 
-        if (pos.X >= Width - CaptureZoneWidth)
+        if (Math.Sqrt(dx * dx + dy * dy) > DragThreshold)
         {
-            // Camera zone — capture
-            e.Handled = true;
-            CaptureRequested?.Invoke();
-        }
-        else
-        {
-            // Drag zone — start window drag
+            _isDragging = true;
             DragMove();
         }
     }
 
-    // ── Toast feedback ────────────────────────────────────────────────
-
-    /// <summary>Show a brief filename toast, then auto-hide.</summary>
-    public void ShowCaptureToast(string fileName)
+    private void OnPreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        FeedbackLabel.Text = $"\u2713  {fileName}";
-        FadeToast(1, 0.12);
-
-        var timer = new System.Timers.Timer(2000) { AutoReset = false };
-        timer.Elapsed += (_, _) =>
+        if (!_isDragging)
         {
-            Dispatcher.InvokeAsync(() => FadeToast(0, 0.15));
-            timer.Dispose();
-        };
-        timer.Start();
+            CaptureRequested?.Invoke();
+            FlashFeedback();
+        }
     }
 
-    private void FadeToast(double targetOpacity, double durationSeconds)
-    {
-        var anim = new DoubleAnimation
-        {
-            To = targetOpacity,
-            Duration = TimeSpan.FromSeconds(durationSeconds),
-            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut },
-        };
-        FeedbackLabel.BeginAnimation(OpacityProperty, anim);
-    }
+    // ── Feedback ──────────────────────────────────────────────────────
 
-    /// <summary>Brief border flash as secondary capture signal.</summary>
-    public void FlashFeedback()
+    /// <summary>Brief blue border flash on capture.</summary>
+    private void FlashFeedback()
     {
         var flash = new ColorAnimation
         {
-            From = System.Windows.Media.Color.FromRgb(0x4A, 0x9E, 0xFF),
+            From = System.Windows.Media.Color.FromRgb(0x5A, 0xAA, 0xFF),
             To   = System.Windows.Media.Color.FromRgb(0x55, 0x55, 0x55),
-            Duration = TimeSpan.FromMilliseconds(400),
+            Duration = TimeSpan.FromMilliseconds(300),
         };
 
-        var brush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x4A, 0x9E, 0xFF));
-        PillBorder.BorderBrush = brush;
+        var brush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x5A, 0xAA, 0xFF));
+        RootCapsule.BorderBrush = brush;
         brush.BeginAnimation(SolidColorBrush.ColorProperty, flash);
     }
 }

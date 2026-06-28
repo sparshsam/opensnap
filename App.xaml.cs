@@ -81,8 +81,6 @@ public partial class App : System.Windows.Application
 
             // Visual feedback
             _tray?.Notify("OpenShot", $"Saved  \u2022  {fileName}");
-            _widget?.FlashFeedback();
-            _widget?.ShowCaptureToast(fileName);
         }
         catch (Exception ex)
         {

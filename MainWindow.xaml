@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="OpenShot"
-        Width="96"
+        Width="80"
         Height="36"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -12,68 +12,38 @@
         ResizeMode="NoResize"
         WindowStartupLocation="Manual"
         Loaded="OnLoaded"
-        PreviewMouseLeftButtonDown="OnPreviewMouseDown">
+        PreviewMouseLeftButtonDown="OnPreviewMouseDown"
+        PreviewMouseMove="OnPreviewMouseMove"
+        PreviewMouseLeftButtonUp="OnPreviewMouseUp">
 
     <Window.Resources>
-        <!-- Subtle shadow shared across states -->
         <DropShadowEffect x:Key="WidgetShadow"
-                          BlurRadius="12"
-                          ShadowDepth="3"
+                          BlurRadius="14"
+                          ShadowDepth="4"
                           Direction="270"
-                          Opacity="0.35"
+                          Opacity="0.40"
                           Color="#000000" />
     </Window.Resources>
 
-    <!-- Pill background -->
-    <Border x:Name="PillBorder"
+    <!-- Single unified dark capsule — the entire surface is the action target -->
+    <Border x:Name="RootCapsule"
+            Width="80"
+            Height="36"
             Background="#2B2B2B"
             CornerRadius="18"
             BorderBrush="#555555"
             BorderThickness="1"
             Effect="{StaticResource WidgetShadow}"
-            Padding="0">
+            Cursor="Hand">
 
-        <Grid>
-            <!-- Camera icon capture zone (right 32px) -->
-            <Border x:Name="CaptureZone"
-                    HorizontalAlignment="Right"
-                    Width="32"
-                    Background="Transparent"
-                    CornerRadius="0,17,17,0"
-                    Cursor="Hand"
-                    ToolTip="Capture screenshot (click)">
-                <Viewbox Width="15"
-                         Height="15"
-                         Stretch="Uniform"
-                         Margin="0,0,2,0">
-                    <Path Fill="#BBBBBB"
-                          Data="M9,3 L12,3 L13,6 L18,6 C19,6 20,7 20,8 L20,17 C20,18 19,19 18,19 L6,19 C5,19 4,18 4,17 L4,8 C4,7 5,6 6,6 L11,6 L12,3 Z M12,9 C10,9 9,10 9,12 C9,14 10,15 12,15 C14,15 15,14 15,12 C15,10 14,9 12,9 Z" />
-                </Viewbox>
-            </Border>
-
-            <!-- App mark / drag hint (left side) -->
-            <Border HorizontalAlignment="Left"
-                    Width="24"
-                    Background="Transparent"
-                    Cursor="Hand">
-                <Ellipse Width="4"
-                         Height="4"
-                         Fill="#666666"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center" />
-            </Border>
-
-            <!-- Feedback toast (hidden, overlays the pill on capture) -->
-            <TextBlock x:Name="FeedbackLabel"
-                       Text="Saved + copied"
-                       Foreground="#4A9EFF"
-                       FontSize="9"
-                       FontFamily="Segoe UI, sans-serif"
-                       FontWeight="SemiBold"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       Opacity="0"
-                       IsHitTestVisible="False" />
-        </Grid>
+        <!-- Camera icon centered as the identity mark -->
+        <Viewbox Width="17"
+                 Height="17"
+                 Stretch="Uniform"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center">
+            <Path Fill="#C0C0C0"
+                  Data="M9,3 L12,3 L13,6 L18,6 C19,6 20,7 20,8 L20,17 C20,18 19,19 18,19 L6,19 C5,19 4,18 4,17 L4,8 C4,7 5,6 6,6 L11,6 L12,3 Z M12,9 C10,9 9,10 9,12 C9,14 10,15 12,15 C14,15 15,14 15,12 C15,10 14,9 12,9 Z" />
+        </Viewbox>
     </Border>
 </Window>
