@@ -1,7 +1,7 @@
-<Window x:Class="OpenShot.MainWindow"
+<Window x:Class="OpenSnap.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="OpenShot"
+        Title="OpenSnap"
         Width="80"
         Height="36"
         WindowStyle="None"
@@ -39,6 +39,8 @@
             <MenuItem Header="Full screen" Tag="FullScreen" Click="OnMenuCapture" />
             <MenuItem Header="Active window" Tag="ActiveWindow" Click="OnMenuCapture" />
             <MenuItem Header="Area selection" Tag="AreaSelection" Click="OnMenuCapture" />
+            <Separator />
+            <MenuItem Header="Capture + OCR" Tag="CaptureOcr" Click="OnMenuCapture" />
             <Separator />
             <MenuItem Header="Settings…" Tag="Settings" Click="OnMenuCapture" />
         </ContextMenu>

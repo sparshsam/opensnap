@@ -1,4 +1,4 @@
-# OpenShot
+# OpenSnap
 
 A minimal, always-on-top desktop screenshot widget for Windows.
 

@@ -4,7 +4,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
-namespace OpenShot;
+namespace OpenSnap;
 
 /// <summary>
 /// The floating widget — glass capsule. Left-click captures full screen;
@@ -54,10 +54,13 @@ public partial class MainWindow : Window
                 CaptureRequested?.Invoke();
                 break;
             case "ActiveWindow":
-                CaptureModeRequested?.Invoke(OpenShot.CaptureMode.ActiveWindow);
+                CaptureModeRequested?.Invoke(OpenSnap.CaptureMode.ActiveWindow);
                 break;
             case "AreaSelection":
-                CaptureModeRequested?.Invoke(OpenShot.CaptureMode.AreaSelection);
+                CaptureModeRequested?.Invoke(OpenSnap.CaptureMode.AreaSelection);
+                break;
+            case "CaptureOcr":
+                CaptureModeRequested?.Invoke(OpenSnap.CaptureMode.CaptureOcr);
                 break;
             case "Settings":
                 SettingsRequested?.Invoke();

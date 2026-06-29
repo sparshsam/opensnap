@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Shapes;
 
-namespace OpenShot;
+namespace OpenSnap;
 
 /// <summary>
 /// Full-screen transparent overlay for dragging a rectangular selection.

@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 
-namespace OpenShot;
+namespace OpenSnap;
 
 /// <summary>
 /// Registers global hotkeys (Win+Shift+S, etc.) and dispatches capture

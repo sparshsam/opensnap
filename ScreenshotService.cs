@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
-namespace OpenShot;
+namespace OpenSnap;
 
 /// <summary>
 /// Handles full-desktop screenshot capture, PNG save, and clipboard copy.

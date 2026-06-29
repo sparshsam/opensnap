@@ -1,7 +1,7 @@
 using System.IO;
 using Forms = System.Windows.Forms;
 
-namespace OpenShot;
+namespace OpenSnap;
 
 /// <summary>
 /// Manages the system-tray icon with a right-click context menu,
@@ -32,7 +32,7 @@ public sealed class TrayService : IDisposable
         _icon = new Forms.NotifyIcon
         {
             Icon = LoadTrayIcon(),
-            Text = "OpenShot — Screenshot widget",
+            Text = "OpenSnap — Screenshot widget",
             Visible = false,
         };
 
@@ -134,7 +134,7 @@ public sealed class TrayService : IDisposable
         try
         {
             var asm = System.Reflection.Assembly.GetExecutingAssembly();
-            using var stream = asm.GetManifestResourceStream("OpenShot.Resources.app.ico");
+            using var stream = asm.GetManifestResourceStream("OpenSnap.Resources.app.ico");
             if (stream is not null)
                 return new System.Drawing.Icon(stream);
         }

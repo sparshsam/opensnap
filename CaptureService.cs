@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
-namespace OpenShot;
+namespace OpenSnap;
 
 /// <summary>
 /// Capture modes available from the widget.
@@ -13,6 +13,7 @@ public enum CaptureMode
     FullScreen,
     ActiveWindow,
     AreaSelection,
+    CaptureOcr,
 }
 
 /// <summary>

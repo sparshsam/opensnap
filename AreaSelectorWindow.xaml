@@ -1,4 +1,4 @@
-<Window x:Class="OpenShot.AreaSelectorWindow"
+<Window x:Class="OpenSnap.AreaSelectorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Select area"

@@ -2,7 +2,7 @@ using System.IO;
 using System.Media;
 using System.Windows;
 
-namespace OpenShot;
+namespace OpenSnap;
 
 public partial class App : System.Windows.Application
 {
@@ -93,6 +93,17 @@ public partial class App : System.Windows.Application
             ScreenshotService.SaveAsPng(source, fullPath);
             ScreenshotService.CopyToClipboard(source);
 
+            // OCR mode: extract text and copy to clipboard too
+            string ocrSuffix = "";
+            if (mode == CaptureMode.CaptureOcr)
+            {
+                var (ocrText, ocrCopied) = await OcrService.CaptureOcrAsync(source);
+                if (!string.IsNullOrWhiteSpace(ocrText))
+                {
+                    ocrSuffix = ocrCopied ? "  + OCR copied" : "  + OCR done";
+                }
+            }
+
             // Play capture sound
             if (_settings.PlayCaptureSound)
                 PlayShutterSound();
@@ -105,13 +116,13 @@ public partial class App : System.Windows.Application
 
             _tray?.UpdateHistory(_settings.ScreenshotHistory);
             _tray?.SetHistoryActionsEnabled(true);
-            _tray?.Notify("OpenShot", $"Saved  \u2022  {fileName}");
+            _tray?.Notify("OpenSnap", $"Saved  \u2022  {fileName}{ocrSuffix}");
         }
         catch (Exception ex)
         {
             System.Windows.MessageBox.Show(
                 $"Screenshot failed:\n{ex.Message}",
-                "OpenShot — Error",
+                "OpenSnap — Error",
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Error);
         }
@@ -139,7 +150,7 @@ public partial class App : System.Windows.Application
         try
         {
             var asm = System.Reflection.Assembly.GetExecutingAssembly();
-            using var stream = asm.GetManifestResourceStream("OpenShot.Resources.capture.wav");
+            using var stream = asm.GetManifestResourceStream("OpenSnap.Resources.capture.wav");
             if (stream is not null)
             {
                 using var player = new SoundPlayer(stream);
@@ -228,7 +239,7 @@ public partial class App : System.Windows.Application
             {
                 _settings.SavePath = dialog.SelectedPath;
                 _settings.Save();
-                _tray?.Notify("OpenShot", $"Save folder changed to {dialog.SelectedPath}");
+                _tray?.Notify("OpenSnap", $"Save folder changed to {dialog.SelectedPath}");
             }
         }
     }

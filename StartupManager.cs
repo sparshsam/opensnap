@@ -1,6 +1,6 @@
 using Microsoft.Win32;
 
-namespace OpenShot;
+namespace OpenSnap;
 
 /// <summary>
 /// Manages the "Launch at startup" toggle via the Windows
@@ -9,7 +9,7 @@ namespace OpenShot;
 public static class StartupManager
 {
     private const string RegistryPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
-    private const string EntryName = "OpenShot";
+    private const string EntryName = "OpenSnap";
 
     /// <summary>Returns the full path to the running executable.</summary>
     private static string ExecutablePath =>

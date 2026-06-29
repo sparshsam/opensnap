@@ -1,7 +1,7 @@
 using System.Windows;
 using Forms = System.Windows.Forms;
 
-namespace OpenShot;
+namespace OpenSnap;
 
 /// <summary>
 /// Settings dialog — save path, always-on-top, launch at startup.

@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text.Json;
 
-namespace OpenShot;
+namespace OpenSnap;
 
 /// <summary>
 /// Application settings persisted as JSON in %APPDATA%/OpenShot/settings.json.
@@ -10,7 +10,7 @@ public sealed class AppSettings
 {
     private static readonly string SettingsDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "OpenShot");
+        "OpenSnap");
 
     private static readonly string SettingsPath = Path.Combine(SettingsDir, "settings.json");
 
@@ -55,7 +55,7 @@ public sealed class AppSettings
             var picturesPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
                 "Screenshots",
-                "OpenShot");
+                "OpenSnap");
             if (settings.SavePath.Equals(picturesPath, StringComparison.OrdinalIgnoreCase))
             {
                 settings.SavePath = GetDefaultSavePath();
@@ -93,7 +93,7 @@ public sealed class AppSettings
 
         return Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "OpenShot",
+            "OpenSnap",
             "Screenshots");
     }
 
