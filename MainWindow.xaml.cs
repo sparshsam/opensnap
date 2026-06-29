@@ -1,15 +1,13 @@
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
 namespace OpenShot;
 
 /// <summary>
-/// The floating widget — unified glass capsule. Click anywhere to capture;
-/// drag anywhere to move. Uses DWM acrylic backdrop for liquid glass look.
+/// The floating widget — glass capsule. Click anywhere to capture;
+/// drag anywhere to move. No rectangular backing — only the pill renders.
 /// </summary>
 public partial class MainWindow : Window
 {
@@ -29,39 +27,7 @@ public partial class MainWindow : Window
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         ClampToVisibleScreen();
-        EnableAcrylicBackdrop();
     }
-
-    // ── DWM Acrylic backdrop (Windows 11 liquid glass) ────────────────
-
-    private void EnableAcrylicBackdrop()
-    {
-        if (Environment.OSVersion.Version.Major < 10) return;
-
-        try
-        {
-            var hwnd = new WindowInteropHelper(this).EnsureHandle();
-
-            // Windows 11: DWMWA_SYSTEMBACKDROP_TYPE
-            // 3 = DWMSBT_ACRYLIC — frosted glass blur behind the window
-            const int DWMWA_SYSTEMBACKDROP_TYPE = 38;
-            int backdropType = 3; // DWMSBT_ACRYLIC
-            DwmSetWindowAttribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, ref backdropType, sizeof(int));
-
-            // Also enable dark mode for the glass chrome
-            const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
-            int darkMode = 1;
-            DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref darkMode, sizeof(int));
-        }
-        catch
-        {
-            // Fallback: acrylic not available (pre-Windows 11 or older build)
-            // The semi-transparent pill still gives a glass-like appearance
-        }
-    }
-
-    [DllImport("dwmapi.dll")]
-    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
     // ── Screen clamping ───────────────────────────────────────────────
 

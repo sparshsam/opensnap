@@ -17,52 +17,55 @@
         PreviewMouseLeftButtonUp="OnPreviewMouseUp">
 
     <Window.Resources>
-        <!-- Soft glass shadow -->
-        <DropShadowEffect x:Key="GlassShadow"
-                          BlurRadius="16"
-                          ShadowDepth="6"
+        <!-- Soft pill shadow — clipped to rounded shape -->
+        <DropShadowEffect x:Key="PillShadow"
+                          BlurRadius="10"
+                          ShadowDepth="3"
                           Direction="270"
-                          Opacity="0.30"
+                          Opacity="0.25"
                           Color="#000000" />
 
         <!-- Glass highlight gradient (top edge reflection) -->
         <LinearGradientBrush x:Key="GlassHighlight"
                              StartPoint="0,0" EndPoint="0,1">
             <GradientStop Offset="0.0" Color="#44FFFFFF" />
-            <GradientStop Offset="0.4" Color="#18FFFFFF" />
+            <GradientStop Offset="0.4" Color="#12FFFFFF" />
             <GradientStop Offset="1.0" Color="#00000000" />
         </LinearGradientBrush>
     </Window.Resources>
 
-    <!-- Single unified glass capsule -->
-    <Border x:Name="RootCapsule"
-            Width="80"
-            Height="36"
-            Background="#1AFFFFFF"
-            CornerRadius="18"
-            BorderBrush="#30FFFFFF"
-            BorderThickness="1"
-            Effect="{StaticResource GlassShadow}"
-            Cursor="Hand"
-            Padding="0">
+    <!-- Root container: transparent — only the pill renders -->
+    <Grid Background="Transparent">
 
-        <Grid>
-            <!-- Glass surface highlight (top reflection line) -->
-            <Border Background="{StaticResource GlassHighlight}"
-                    CornerRadius="18"
-                    Opacity="0.6"
-                    IsHitTestVisible="False" />
+        <!-- The pill: semi-transparent glass capsule -->
+        <Border x:Name="RootCapsule"
+                Width="80"
+                Height="36"
+                Background="#1AFFFFFF"
+                CornerRadius="18"
+                BorderBrush="#30FFFFFF"
+                BorderThickness="1"
+                Effect="{StaticResource PillShadow}"
+                Cursor="Hand">
 
-            <!-- Camera icon -->
-            <Viewbox Width="18"
-                     Height="18"
-                     Stretch="Uniform"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"
-                     IsHitTestVisible="False">
-                <Path Fill="#D0D0D0"
-                      Data="M12,3.5 L14.5,3.5 L16,6.5 L20,6.5 C21.1,6.5 22,7.4 22,8.5 L22,18.5 C22,19.6 21.1,20.5 20,20.5 L4,20.5 C2.9,20.5 2,19.6 2,18.5 L2,8.5 C2,7.4 2.9,6.5 4,6.5 L8,6.5 L9.5,3.5 Z M12,9.5 C9.8,9.5 8,11.3 8,13.5 C8,15.7 9.8,17.5 12,17.5 C14.2,17.5 16,15.7 16,13.5 C16,11.3 14.2,9.5 12,9.5 Z" />
-            </Viewbox>
-        </Grid>
-    </Border>
+            <Grid>
+                <!-- Glass highlight overlay -->
+                <Border Background="{StaticResource GlassHighlight}"
+                        CornerRadius="18"
+                        Opacity="0.6"
+                        IsHitTestVisible="False" />
+
+                <!-- Camera icon -->
+                <Viewbox Width="18"
+                         Height="18"
+                         Stretch="Uniform"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         IsHitTestVisible="False">
+                    <Path Fill="#D0D0D0"
+                          Data="M12,3.5 L14.5,3.5 L16,6.5 L20,6.5 C21.1,6.5 22,7.4 22,8.5 L22,18.5 C22,19.6 21.1,20.5 20,20.5 L4,20.5 C2.9,20.5 2,19.6 2,18.5 L2,8.5 C2,7.4 2.9,6.5 4,6.5 L8,6.5 L9.5,3.5 Z M12,9.5 C9.8,9.5 8,11.3 8,13.5 C8,15.7 9.8,17.5 12,17.5 C14.2,17.5 16,15.7 16,13.5 C16,11.3 14.2,9.5 12,9.5 Z" />
+                </Viewbox>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>
