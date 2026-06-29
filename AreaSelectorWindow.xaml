@@ -1,0 +1,36 @@
+<Window x:Class="OpenShot.AreaSelectorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Select area"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="#0F000000"
+        WindowState="Maximized"
+        Topmost="True"
+        ShowInTaskbar="False"
+        Cursor="Cross"
+        ResizeMode="NoResize"
+        Loaded="OnLoaded"
+        PreviewKeyDown="OnPreviewKeyDown"
+        MouseLeftButtonDown="OnMouseDown"
+        MouseMove="OnMouseMove"
+        MouseLeftButtonUp="OnMouseUp">
+
+    <!-- Semi-transparent dark overlay; selection rectangle cuts through -->
+    <Canvas x:Name="Overlay">
+        <!-- Selection border (drawn during drag) -->
+        <Rectangle x:Name="SelectionRect"
+                   Stroke="#4A9EFF"
+                   StrokeThickness="2"
+                   Fill="#304A9EFF"
+                   Visibility="Collapsed" />
+
+        <!-- Size label -->
+        <TextBlock x:Name="SizeLabel"
+                   Foreground="White"
+                   FontSize="11"
+                   FontFamily="Segoe UI, sans-serif"
+                   Visibility="Collapsed"
+                   IsHitTestVisible="False" />
+    </Canvas>
+</Window>

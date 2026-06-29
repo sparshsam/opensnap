@@ -14,10 +14,10 @@
         Loaded="OnLoaded"
         PreviewMouseLeftButtonDown="OnPreviewMouseDown"
         PreviewMouseMove="OnPreviewMouseMove"
-        PreviewMouseLeftButtonUp="OnPreviewMouseUp">
+        PreviewMouseLeftButtonUp="OnPreviewMouseUp"
+        PreviewMouseRightButtonUp="OnPreviewRightClick">
 
     <Window.Resources>
-        <!-- Soft pill shadow — clipped to rounded shape -->
         <DropShadowEffect x:Key="PillShadow"
                           BlurRadius="10"
                           ShadowDepth="3"
@@ -25,7 +25,6 @@
                           Opacity="0.25"
                           Color="#000000" />
 
-        <!-- Glass highlight gradient (top edge reflection) -->
         <LinearGradientBrush x:Key="GlassHighlight"
                              StartPoint="0,0" EndPoint="0,1">
             <GradientStop Offset="0.0" Color="#44FFFFFF" />
@@ -34,10 +33,18 @@
         </LinearGradientBrush>
     </Window.Resources>
 
-    <!-- Root container: transparent — only the pill renders -->
-    <Grid Background="Transparent">
+    <!-- Right-click context menu -->
+    <Window.ContextMenu>
+        <ContextMenu x:Name="CaptureMenu">
+            <MenuItem Header="Full screen" Tag="FullScreen" Click="OnMenuCapture" />
+            <MenuItem Header="Active window" Tag="ActiveWindow" Click="OnMenuCapture" />
+            <MenuItem Header="Area selection" Tag="AreaSelection" Click="OnMenuCapture" />
+            <Separator />
+            <MenuItem Header="Settings…" Tag="Settings" Click="OnMenuCapture" />
+        </ContextMenu>
+    </Window.ContextMenu>
 
-        <!-- The pill: semi-transparent glass capsule -->
+    <Grid Background="Transparent">
         <Border x:Name="RootCapsule"
                 Width="80"
                 Height="36"
@@ -49,13 +56,11 @@
                 Cursor="Hand">
 
             <Grid>
-                <!-- Glass highlight overlay -->
                 <Border Background="{StaticResource GlassHighlight}"
                         CornerRadius="18"
                         Opacity="0.6"
                         IsHitTestVisible="False" />
 
-                <!-- Camera icon -->
                 <Viewbox Width="18"
                          Height="18"
                          Stretch="Uniform"

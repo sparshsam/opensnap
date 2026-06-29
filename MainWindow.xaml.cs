@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -6,8 +7,8 @@ using System.Windows.Media.Animation;
 namespace OpenShot;
 
 /// <summary>
-/// The floating widget — glass capsule. Click anywhere to capture;
-/// drag anywhere to move. No rectangular backing — only the pill renders.
+/// The floating widget — glass capsule. Left-click captures full screen;
+/// right-click opens a quick-mode menu.
 /// </summary>
 public partial class MainWindow : Window
 {
@@ -16,7 +17,14 @@ public partial class MainWindow : Window
     private bool _isDragging;
     private const double DragThreshold = 6;
 
+    /// <summary>Raised on left-click (full-screen capture).</summary>
     public event Action? CaptureRequested;
+
+    /// <summary>Raised on right-click menu selection.</summary>
+    public event Action<CaptureMode>? CaptureModeRequested;
+
+    /// <summary>Raised when Settings is selected from the context menu.</summary>
+    public event Action? SettingsRequested;
 
     public MainWindow(AppSettings settings)
     {
@@ -27,6 +35,37 @@ public partial class MainWindow : Window
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         ClampToVisibleScreen();
+    }
+
+    // ── Right-click context menu ──────────────────────────────────────
+
+    private void OnPreviewRightClick(object sender, MouseButtonEventArgs e)
+    {
+        // Show the context menu at the cursor position
+        CaptureMenu.IsOpen = true;
+        e.Handled = true;
+    }
+
+    private void OnMenuCapture(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem item || item.Tag is not string tag)
+            return;
+
+        switch (tag)
+        {
+            case "FullScreen":
+                CaptureRequested?.Invoke();
+                break;
+            case "ActiveWindow":
+                CaptureModeRequested?.Invoke(OpenShot.CaptureMode.ActiveWindow);
+                break;
+            case "AreaSelection":
+                CaptureModeRequested?.Invoke(OpenShot.CaptureMode.AreaSelection);
+                break;
+            case "Settings":
+                SettingsRequested?.Invoke();
+                break;
+        }
     }
 
     // ── Screen clamping ───────────────────────────────────────────────
