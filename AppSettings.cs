@@ -4,7 +4,7 @@ using System.Text.Json;
 namespace OpenSnap;
 
 /// <summary>
-/// Application settings persisted as JSON in %APPDATA%/OpenShot/settings.json.
+/// Application settings persisted as JSON in %APPDATA%/OpenSnap/settings.json.
 /// </summary>
 public sealed class AppSettings
 {

@@ -2,32 +2,50 @@
 
 A minimal, always-on-top desktop screenshot widget for Windows.
 
-Click anywhere on the dark capsule to grab the full multi-monitor desktop, save it as PNG
-to your Desktop, and copy it to your clipboard — all in one click.
+Click anywhere on the glass capsule to grab the full multi-monitor desktop,
+save it as PNG to your Desktop, and copy it to your clipboard — all in one
+click. Or right-click for capture modes including OCR text extraction.
 
 ## Features
 
-- Compact dark capsule (~80 × 36 px), single unified action surface  
-- Subtle drop shadow, clean capsule design  
+- Compact glass capsule (~80 × 36 px), draggable anywhere
+- Subtle drop shadow, translucent frosted-glass appearance
 - Always-on-top
 - Full multi-monitor desktop capture
+- Active window capture (foreground window only)
+- Area selection (fullscreen drag-select overlay)
+- **Capture + OCR** — extracts text via built-in Windows OCR, copies to clipboard
 - Saves to **Desktop** by default (configurable)
-- Auto-generates filenames: `screenshot-yyyy-MM-dd-HHmmss.png`
-- Copies to clipboard automatically (retries 3× if locked)
-- System tray icon (hidden in the taskbar overflow area) with context menu:
-  - Capture
-  - Open Desktop folder
-  - Change save folder…
-  - Launch at startup (toggle)
-  - Quit
-- Settings persisted to `%APPDATA%/OpenShot/settings.json`
-- Startup position clamped to visible work area (handles monitor changes)
+- Auto-generates filenames with customisable template
+- Copies image to clipboard automatically (retries 3× if locked)
+- Copies OCR text to clipboard automatically
+- Global hotkeys: Win+Shift+S (full screen), Win+Shift+W (active window)
+- Screenshot history (last 20) in tray menu
+- Optional capture shutter sound
+- System tray icon with context menu
+- Launch at startup toggle
+- Settings persist to `%APPDATA%\OpenSnap\settings.json`
+- Startup position clamped to visible work area
 - Error handling for missing folders, clipboard issues, capture failures
+
+## Input reference
+
+| Input | Action |
+|---|---|
+| **Left-click** | Capture full screen |
+| **Right-click** | Open capture mode menu |
+| **Middle-click** | Capture active window |
+| **Double-click** | Suppressed (avoids double-save) |
+| **Drag** | Move widget |
+| **Win+Shift+S** | Capture full screen (global) |
+| **Win+Shift+W** | Capture active window (global) |
+
+Right-click menu: Full screen / Active window / Area selection / Capture + OCR / Settings
 
 ## Prerequisites
 
 - Windows 10 / 11
-- [.NET 8 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) or SDK installed on the system
+- [.NET 8 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) installed
 
 ## Build
 
@@ -37,70 +55,99 @@ dotnet restore
 dotnet build -c Release
 ```
 
-## Publish (framework-dependent — fast, small)
+## Publish
 
 ```cmd
 dotnet publish -c Release -o release
 ```
 
-The output `release\OpenShot.exe` is ~170 KB and launches instantly. Requires
-the .NET 8 runtime to be installed on the target machine (not bundled).
+Output: `release\OpenSnap.exe` (~170 KB, framework-dependent, instant launch).
 
 ## Run
 
-Double-click `OpenShot.lnk` on the desktop, or run:
-
-```cmd
-dotnet run -c Release
+Double-click **OpenSnap.lnk** on the desktop, or run `dotnet run -c Release`.
 
 ## Startup behavior
 
-When **Launch at startup** is toggled on (via the tray menu), OpenShot
+When **Launch at startup** is toggled on (via the tray menu), OpenSnap
 registers itself under:
 
 ```
-HKCU\Software\Microsoft\Windows\CurrentVersion\Run\OpenShot
+HKCU\Software\Microsoft\Windows\CurrentVersion\Run\OpenSnap
 ```
 
-The app starts automatically on Windows login. It lives in the system tray —
-the floating widget appears on screen; closing the widget keeps the app running
-in the tray. Use the **Quit** tray item to fully exit.
+The app starts automatically on Windows login. It lives in the system tray.
 
-## Test checklist
+## Settings
 
-- [ ] Widget drags smoothly across the screen
-- [ ] Widget stays on top of all other windows
-- [ ] Click anywhere on the capsule → screenshot captured  
-- [ ] Drag smoothly from anywhere on the capsule  
-- [ ] Screenshot saved to Desktop as `screenshot-YYYY-MM-DD-HHmmss.png`
-- [ ] Ctrl+V pastes the screenshot into an app (Paint, Word, chat)
-- [ ] Tray icon visible in system tray overflow area
-- [ ] Double-click tray icon → captures screenshot
-- [ ] Tray menu → Capture works
-- [ ] Tray menu → Open Desktop folder opens Explorer
-- [ ] Tray menu → Change save folder persists across restarts
-- [ ] Tray menu → Launch at startup toggle (check Regedit)
-- [ ] Tray menu → Quit exits fully (no tray residue)
-- [ ] Widget position persists across restart
-- [ ] Widget clamped to visible area if monitor layout changed
-- [ ] Default save path is C:\Users\spars\Desktop
-- [ ] Widget renders correctly at 100%, 125%, and 150% Windows scaling
-- [ ] Drop shadow renders correctly on light and dark desktop backgrounds
-- [ ] App icon shows openshot camera icon in taskbar/tray/title bar
-- [ ] Icon renders correctly on the widget at all scaling levels
+Stored at `%APPDATA%\OpenSnap\settings.json`. Configurable fields:
 
-## Project Structure
+| Field | Default | Description |
+|---|---|---|
+| `SavePath` | Desktop | Folder for screenshots |
+| `AlwaysOnTop` | true | Widget stays above other windows |
+| `LaunchAtStartup` | false | Auto-start with Windows |
+| `PlayCaptureSound` | true | Play shutter sound on capture |
+| `FilenameTemplate` | `screenshot-{yyyy}-{MM}-{dd}-{HHmmss}` | Template with `{yyyy}`, `{MM}`, `{dd}`, `{HH}`, `{mm}`, `{ss}`, `{HHmmss}` |
+| `ScreenshotHistory` | [] | Last 20 saved file paths |
+
+## Project structure
 
 ```
-OpenShot/
-├── OpenShot.csproj            — .NET 8 Windows WPF project
-├── App.xaml / .cs             — Entry point, lifecycle, tray wiring
-├── MainWindow.xaml / .cs      — Floating pill widget
-├── AppSettings.cs             — JSON settings persistence
-├── ScreenshotService.cs       — Capture, save, clipboard (with retry)
-├── StartupManager.cs          — Registry Run key management
-├── TrayService.cs             — System tray icon + context menu
-├── Resources/app.ico          — Application icon
+openshot/                        # Git repository root (named from before rename)
+├── OpenSnap.csproj              # .NET 8 WPF + WinRT project
+├── App.xaml / .cs               # Entry point, capture dispatch, tray wiring
+├── MainWindow.xaml / .cs        # Floating glass widget
+├── AppSettings.cs               # JSON settings persistence
+├── ScreenshotService.cs         # Capture, save, clipboard, filename template
+├── CaptureService.cs            # Active window + area capture
+├── OcrService.cs                # Windows OCR text extraction
+├── HotkeyService.cs             # Global hotkeys (RegisterHotKey)
+├── TrayService.cs               # System tray icon + context menu
+├── StartupManager.cs            # Registry Run key management
+├── AreaSelectorWindow           # Fullscreen drag-select overlay
+├── SettingsWindow               # Settings dialog
+├── Resources/app.ico            # Application icon
+├── Resources/capture.wav        # Shutter sound
 ├── README.md
 └── .gitignore
 ```
+
+> Note: The repo folder is still named `openshot` (from the original project
+> name). This is cosmetic only — the app itself is fully branded as OpenSnap.
+> Renaming the folder would break the git remote. All assembly names,
+> namespaces, display strings, settings paths, and shortcuts use **OpenSnap**.
+
+## QA checklist (v0.5.1)
+
+- [ ] Full screen capture saves PNG to Desktop
+- [ ] Active window capture captures only the focused window
+- [ ] Area selection overlay appears, drag works, Escape cancels
+- [ ] Capture + OCR saves image AND copies extracted text
+- [ ] OCR text pastes correctly into Notepad / Word
+- [ ] Clipboard image pastes into Paint / chat app
+- [ ] Recent screenshots submenu shows last 5 entries
+- [ ] Open last screenshot opens the file
+- [ ] Copy file path copies full path to clipboard
+- [ ] Reveal in Explorer opens folder with file selected
+- [ ] Startup toggle writes HKCU registry key
+- [ ] Widget reopens after login when startup is enabled
+- [ ] No duplicate tray icons after multiple launches
+- [ ] Double-click does not create duplicate saves
+- [ ] Widget position persists across restart
+- [ ] Off-screen widget resets to visible area
+- [ ] Tray icon shows OpenSnap icon
+- [ ] Published exe is named `OpenSnap.exe`
+- [ ] Desktop shortcut is `OpenSnap.lnk` (no .bat file)
+- [ ] Global hotkeys Win+Shift+S and Win+Shift+W work from any app
+
+## Release history
+
+| Tag | Date | Highlights |
+|---|---|---|
+| v0.1.1 | — | Initial build, basic pill widget, tray icon, settings |
+| v0.1.2 | — | Camera centering, Desktop save, glass UI, rectangular backing fix |
+| v0.2.0 | — | Capture modes (active window, area selection), settings dialog |
+| v0.4.0 | — | Global hotkeys, middle-click, history, capture sound, filename templates |
+| v0.5.0 | — | Windows OCR (Capture + OCR), renamed OpenShot → OpenSnap |
+| **v0.5.1** | **today** | **Stabilisation: naming cleanup, README rewrite, packaging verified** |

@@ -11,7 +11,7 @@
     <ApplicationIcon>Resources\app.ico</ApplicationIcon>
     <AssemblyName>OpenSnap</AssemblyName>
     <RootNamespace>OpenSnap</RootNamespace>
-    <Version>0.5.0</Version>
+    <Version>0.5.1</Version>
     <Description>A minimal floating screenshot widget for Windows.</Description>
     <Authors>Sparsh</Authors>
     <Product>OpenSnap</Product>
