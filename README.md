@@ -47,21 +47,72 @@ Right-click menu: Full screen / Active window / Area selection / Capture + OCR /
 - Windows 10 / 11
 - [.NET 8 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) installed
 
+## Installation
+
+### Download
+Download the latest installer from the [Releases](https://github.com/sparshsam/opensnap/releases) page:
+
+```
+OpenSnap-Setup-v0.6.0.exe
+```
+
+### Install
+1. Run `OpenSnap-Setup-v0.6.0.exe`
+2. Choose whether to create a desktop shortcut
+3. Launch OpenSnap from the Start Menu or desktop shortcut
+
+The app is installed to `%LOCALAPPDATA%\Programs\OpenSnap`.  
+Settings are stored separately at `%APPDATA%\OpenSnap\settings.json` and are never touched during upgrades.
+
+### Upgrade
+The installer replaces all program files. Your settings (`%APPDATA%\OpenSnap\settings.json`) are preserved automatically — no migration step needed. Just run the new installer over the old installation.
+
+### Uninstall
+**Via Settings → Apps:**
+1. Open **Settings → Apps → Installed apps**
+2. Search for **OpenSnap**
+3. Click **Uninstall**
+
+**Via Start Menu:**
+1. Open the Start Menu and find **OpenSnap**
+2. Right-click → **Uninstall**
+
+Running the installer again also gives the option to remove OpenSnap.
+
+### Troubleshooting
+
+| Problem | Fix |
+|---------|-----|
+| "Windows protected your PC" (SmartScreen) | Click **More info → Run anyway**. The installer is signed by the developer certificate. |
+| App won't start | Ensure [.NET 8 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is installed. |
+| Settings lost after upgrade | Settings are stored in `%APPDATA%\OpenSnap\` and are never deleted by the installer. If missing, check that directory still exists. |
+| OCR not working | OCR uses Windows language packs. Go to **Settings → Time & Language → Language & region** and install your language's speech/OCR support. |
+
 ## Build
 
 ```cmd
-cd C:\Users\spars\repos\openshot
+cd C:\Users\spars\repos\opensnap
 dotnet restore
 dotnet build -c Release
 ```
 
-## Publish
+## Publish & package
 
 ```cmd
 dotnet publish -c Release -o release
 ```
 
 Output: `release\OpenSnap.exe` (~170 KB, framework-dependent, instant launch).
+
+### Build installer
+
+```cmd
+build-installer.bat
+```
+
+Requires [Inno Setup 6](https://jrsoftware.org/isdl.php) installed at `C:\Program Files (x86)\Inno Setup 6`.
+
+Output: `dist\OpenSnap-Setup-v0.6.0.exe` (~5.5 MB).
 
 ## Run
 
@@ -94,7 +145,7 @@ Stored at `%APPDATA%\OpenSnap\settings.json`. Configurable fields:
 ## Project structure
 
 ```
-openshot/                        # Git repository root (named from before rename)
+opensnap/                        # Git repository root
 ├── OpenSnap.csproj              # .NET 8 WPF + WinRT project
 ├── App.xaml / .cs               # Entry point, capture dispatch, tray wiring
 ├── MainWindow.xaml / .cs        # Floating glass widget
@@ -106,40 +157,33 @@ openshot/                        # Git repository root (named from before rename
 ├── TrayService.cs               # System tray icon + context menu
 ├── StartupManager.cs            # Registry Run key management
 ├── AreaSelectorWindow           # Fullscreen drag-select overlay
-├── SettingsWindow               # Settings dialog
+├── SettingsWindow               # Settings dialog (hotkeys, sound, template)
+├── AboutDialog                  # About dialog (version, GitHub, license)
 ├── Resources/app.ico            # Application icon
 ├── Resources/capture.wav        # Shutter sound
+├── setup.iss                    # Inno Setup installer script
+├── build-installer.bat          # Build + installer packaging script
 ├── README.md
 └── .gitignore
 ```
 
-> Note: The repo folder is still named `openshot` (from the original project
-> name). This is cosmetic only — the app itself is fully branded as OpenSnap.
-> Renaming the folder would break the git remote. All assembly names,
-> namespaces, display strings, settings paths, and shortcuts use **OpenSnap**.
 
-## QA checklist (v0.5.1)
 
+## QA checklist (v0.6.0)
+
+- [ ] Installer runs and installs to `%LOCALAPPDATA%\Programs\OpenSnap`
+- [ ] Start Menu shortcut created
+- [ ] Desktop shortcut created (when selected)
+- [ ] OpenSnap launches from Start Menu
+- [ ] Uninstall removes all program files
+- [ ] Settings preserved after reinstall (upgrade)
+- [ ] Settings → About shows correct version and GitHub link
+- [ ] Settings → Hotkey combos change saved and applied
+- [ ] Play capture sound toggle works
 - [ ] Full screen capture saves PNG to Desktop
-- [ ] Active window capture captures only the focused window
-- [ ] Area selection overlay appears, drag works, Escape cancels
+- [ ] Active window capture captures only the focused window (not the widget)
+- [ ] Area selection overlay captures the selected region
 - [ ] Capture + OCR saves image AND copies extracted text
-- [ ] OCR text pastes correctly into Notepad / Word
-- [ ] Clipboard image pastes into Paint / chat app
-- [ ] Recent screenshots submenu shows last 5 entries
-- [ ] Open last screenshot opens the file
-- [ ] Copy file path copies full path to clipboard
-- [ ] Reveal in Explorer opens folder with file selected
-- [ ] Startup toggle writes HKCU registry key
-- [ ] Widget reopens after login when startup is enabled
-- [ ] No duplicate tray icons after multiple launches
-- [ ] Double-click does not create duplicate saves
-- [ ] Widget position persists across restart
-- [ ] Off-screen widget resets to visible area
-- [ ] Tray icon shows OpenSnap icon
-- [ ] Published exe is named `OpenSnap.exe`
-- [ ] Desktop shortcut is `OpenSnap.lnk` (no .bat file)
-- [ ] Global hotkeys Win+Shift+S and Win+Shift+W work from any app
 
 ## Release history
 
@@ -150,4 +194,5 @@ openshot/                        # Git repository root (named from before rename
 | v0.2.0 | — | Capture modes (active window, area selection), settings dialog |
 | v0.4.0 | — | Global hotkeys, middle-click, history, capture sound, filename templates |
 | v0.5.0 | — | Windows OCR (Capture + OCR), renamed OpenShot → OpenSnap |
-| **v0.5.1** | **today** | **Stabilisation: naming cleanup, README rewrite, packaging verified** |
+| **v0.5.1** | — | **Stabilisation: naming cleanup, README rewrite, packaging verified** |
+| **v0.6.0** | — | **Installer & distribution: Inno Setup packaging, About dialog, hotkey config in settings, area selection fix, active window fix** |

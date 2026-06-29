@@ -1,6 +1,7 @@
 using System.IO;
 using System.Media;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace OpenSnap;
 
@@ -77,12 +78,25 @@ public partial class App : System.Windows.Application
     {
         try
         {
-            var source = mode switch
+            BitmapSource? source = null;
+
+            // For ActiveWindow, temporarily hide the widget so
+            // GetForegroundWindow() returns the window behind it.
+            if (mode == CaptureMode.ActiveWindow)
             {
-                CaptureMode.ActiveWindow => CaptureService.CaptureActiveWindow(),
-                CaptureMode.AreaSelection => await CaptureAreaAsync(),
-                _ => ScreenshotService.CaptureDesktop(),
-            };
+                _widget?.Hide();
+                await Task.Delay(50); // let Win32 process foreground change
+                source = CaptureService.CaptureActiveWindow();
+                _widget?.Show();
+            }
+            else
+            {
+                source = mode switch
+                {
+                    CaptureMode.AreaSelection => await CaptureAreaAsync(),
+                    _ => ScreenshotService.CaptureDesktop(),
+                };
+            }
 
             if (source == null) return;
 

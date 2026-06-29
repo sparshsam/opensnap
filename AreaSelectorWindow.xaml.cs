@@ -89,7 +89,9 @@ public partial class AreaSelectorWindow : Window
 
         var callback = SelectionCompleted;
         SelectionCompleted = null;
-        Close();
+        // Invoke callback BEFORE Close() so the Closed event doesn't
+        // race ahead and null out the TaskCompletionSource first.
         callback?.Invoke(new System.Windows.Rect(x, y, w, h));
+        Close();
     }
 }

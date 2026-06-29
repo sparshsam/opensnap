@@ -11,7 +11,7 @@ A minimal, always-on-top desktop screenshot widget for Windows.
 ## Project structure
 
 ```
-/home/spars/repos/openshot/          # Git repo root (pre-rename folder name)
+/home/spars/repos/opensnap/           # Git repo root
 ├── OpenShot.csproj                   # .NET 8 WPF + WinRT project
 ├── App.xaml / .cs                    # Entry point, capture dispatch, tray wiring
 ├── MainWindow.xaml / .cs             # Floating glass widget (80×36 pill)
@@ -24,7 +24,7 @@ A minimal, always-on-top desktop screenshot widget for Windows.
 ├── StartupManager.cs                 # Registry Run key management
 ├── AreaSelectorWindow.xaml / .cs     # Fullscreen drag-select overlay
 ├── SettingsWindow.xaml / .cs         # Settings dialog
-├── Resources/app.ico                 # Application icon (openshot asset)
+├── Resources/app.ico                 # Application icon
 ├── Resources/capture.wav             # Camera shutter sound
 ├── README.md
 ├── CLAUDE.md
@@ -103,8 +103,8 @@ The app targets `net8.0-windows10.0.19041.0` for access to `Windows.Media.Ocr`.
 
 ```bash
 # Quick cycle (WSL dev → Windows build)
-rsync -a . /mnt/c/Users/spars/repos/openshot/ --exclude=.git --exclude=bin --exclude=obj
-/mnt/c/Windows/System32/cmd.exe /c "C:\tmp\publish-openshot.bat"
+rsync -a . /mnt/c/Users/spars/repos/opensnap/ --exclude=.git --exclude=bin --exclude=obj
+/mnt/c/Windows/System32/cmd.exe /c "C:\tmp\publish-opensnap.bat"
 /mnt/c/Windows/System32/cmd.exe /c "powershell.exe -ExecutionPolicy Bypass -File C:\tmp\createshortcut.ps1"
 
 # Commit & tag
@@ -114,7 +114,7 @@ git tag -f v0.x.x
 git push origin main --tags
 ```
 
-The batch file at `C:\tmp\publish-openshot.bat` handles dotnet restore + publish.
+The batch file at `C:\tmp\publish-opensnap.bat` handles dotnet restore + publish.
 The PowerShell script at `C:\tmp\createshortcut.ps1` updates the desktop `.lnk`.
 
 ## Release history

@@ -1,6 +1,6 @@
 # OpenSnap — Project Status
 
-**Version:** v0.5.1 (stabilisation release)
+**Version:** v0.6.0 (installer & distribution release)
 **Status:** Active development, early stage
 **Target:** Windows 10/11 desktop screenshot widget
 
@@ -32,6 +32,14 @@ Capture + OCR (Windows built-in text recognition).
 
 ## What needs attention
 
+### Fixed in v0.6.0
+- Area selection now captures the selected region (callback-order bug)
+- Active window capture grabs the correct window (widget is hidden before capture)
+- Settings no longer crashes on open (XAML SelectedIndex + null-ref during InitializeComponent)
+- Play capture sound toggle now exposed in UI
+- Hotkey configuration available in Settings
+- About dialog with version and GitHub link
+
 ### Known rough edges
 - **CLI:** Not published as a CLI tool / no command-line arguments yet
 - **Settings:** No hotkey re-binding UI in the settings dialog (hotkey values
@@ -53,7 +61,7 @@ Capture + OCR (Windows built-in text recognition).
 - Must build on Windows (WPF + WinRT not available on Linux)
 - Publish requires `cmd.exe` through WSL interop (UNC path workaround)
 - No CI/CD pipeline
-- No installer — user runs the published exe directly
+- Installer built with Inno Setup (`build-installer.bat`)
 
 ## Upcoming / planned
 
@@ -80,8 +88,8 @@ for these types.
 
 ## Release process
 
-1. Commit changes on WSL side (`/home/spars/repos/openshot/`)
-2. Sync to Windows: `rsync -a . /mnt/c/Users/spars/repos/openshot/ --exclude=.git --exclude=bin --exclude=obj`
-3. Publish via cmd.exe: `/mnt/c/Windows/System32/cmd.exe /c "C:\tmp\publish-openshot.bat"`
+1. Commit changes on WSL side (`/home/spars/repos/opensnap/`)
+2. Sync to Windows: `rsync -a . /mnt/c/Users/spars/repos/opensnap/ --exclude=.git --exclude=bin --exclude=obj`
+3. Publish via cmd.exe: `/mnt/c/Windows/System32/cmd.exe /c "C:\tmp\publish-opensnap.bat"`
 4. Update shortcut via PowerShell: `/mnt/c/Windows/System32/cmd.exe /c "powershell.exe -ExecutionPolicy Bypass -File C:\tmp\createshortcut.ps1"`
 5. Tag and push: `git tag -f v0.x.x && git push origin main --tags`
