@@ -66,11 +66,19 @@ public static class ScreenshotService
         return false;
     }
 
-    /// <summary>Generates a timestamped filename: screenshot-yyyy-MM-dd-HHmmss.png</summary>
-    public static string GenerateFileName()
+    /// <summary>Generates a timestamped filename using the configured template.</summary>
+    public static string GenerateFileName(string? template = null)
     {
-        var timestamp = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
-        return $"screenshot-{timestamp}.png";
+        var fmt = template ?? "screenshot-{yyyy}-{MM}-{dd}-{HHmmss}";
+        var now = DateTime.Now;
+        fmt = fmt.Replace("{yyyy}", now.ToString("yyyy"))
+                 .Replace("{MM}", now.ToString("MM"))
+                 .Replace("{dd}", now.ToString("dd"))
+                 .Replace("{HH}", now.ToString("HH"))
+                 .Replace("{mm}", now.ToString("mm"))
+                 .Replace("{ss}", now.ToString("ss"))
+                 .Replace("{HHmmss}", now.ToString("HHmmss"));
+        return fmt + ".png";
     }
 
     /// <summary>Opens the folder in File Explorer.</summary>
@@ -79,6 +87,15 @@ public static class ScreenshotService
         if (Directory.Exists(folderPath))
         {
             System.Diagnostics.Process.Start("explorer.exe", folderPath);
+        }
+    }
+
+    /// <summary>Reveals a specific file in Explorer (selects it).</summary>
+    public static void RevealInExplorer(string filePath)
+    {
+        if (File.Exists(filePath))
+        {
+            System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{filePath}\"");
         }
     }
 

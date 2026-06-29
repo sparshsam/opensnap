@@ -22,6 +22,21 @@ public sealed class AppSettings
     public bool AlwaysOnTop { get; set; } = true;
     public bool LaunchAtStartup { get; set; } = false;
 
+    // v0.3.0 — hotkeys
+    public int HotkeyCaptureModifiers { get; set; } = 12;  // MOD_WIN | MOD_SHIFT
+    public int HotkeyCaptureKey { get; set; } = 0x53;       // VK_S
+    public int HotkeyActiveWinModifiers { get; set; } = 12; // MOD_WIN | MOD_SHIFT
+    public int HotkeyActiveWinKey { get; set; } = 0x57;     // VK_W
+
+    // v0.3.0 — sound
+    public bool PlayCaptureSound { get; set; } = true;
+
+    // v0.4.0 — filename template
+    public string FilenameTemplate { get; set; } = "screenshot-{yyyy}-{MM}-{dd}-{HHmmss}";
+
+    // v0.4.0 — history (last 20 file paths)
+    public List<string> ScreenshotHistory { get; set; } = new();
+
     // ── Serialisation ─────────────────────────────────────────────────
 
     public static AppSettings Load()
@@ -34,6 +49,7 @@ public sealed class AppSettings
             var json = File.ReadAllText(SettingsPath);
             var settings = JsonSerializer.Deserialize<AppSettings>(json);
             settings ??= new AppSettings();
+            settings.ScreenshotHistory ??= new();
 
             // Migrate old default path to Desktop
             var picturesPath = Path.Combine(
@@ -69,23 +85,18 @@ public sealed class AppSettings
 
     // ── Helpers ────────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Default save path: C:\Users\&lt;user&gt;\Desktop
-    /// </summary>
     public static string GetDefaultSavePath()
     {
         var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         if (!string.IsNullOrEmpty(desktop))
             return desktop;
 
-        // Last-resort fallback
         return Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "OpenShot",
             "Screenshots");
     }
 
-    /// <summary>Ensures the configured save folder exists, creating it if needed.</summary>
     public static string EnsureFolder(string path)
     {
         Directory.CreateDirectory(path);

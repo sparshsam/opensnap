@@ -1,17 +1,15 @@
 using System.IO;
+using System.Media;
 using System.Windows;
 
 namespace OpenShot;
 
-/// <summary>
-/// Application entry point. Owns settings, screenshot logic, tray lifecycle,
-/// startup registration, and the new capture-mode dispatch.
-/// </summary>
 public partial class App : System.Windows.Application
 {
     private TrayService? _tray;
     private AppSettings? _settings;
     private MainWindow? _widget;
+    private HotkeyService? _hotkeys;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -33,19 +31,35 @@ public partial class App : System.Windows.Application
         _tray.OpenFolderRequested += OnOpenFolder;
         _tray.ChangeFolderRequested += OnChangeFolder;
         _tray.StartupToggleRequested += OnStartupToggle;
+        _tray.OpenLastScreenshotRequested += OnOpenLastScreenshot;
+        _tray.CopyFilePathRequested += OnCopyFilePath;
+        _tray.RevealInExplorerRequested += OnRevealInExplorer;
+        _tray.OpenHistoryItemRequested += OnOpenHistoryItem;
         _tray.QuitRequested += OnQuit;
         _tray.SetStartupChecked(_settings.LaunchAtStartup);
+        _tray.UpdateHistory(_settings.ScreenshotHistory);
+        _tray.SetHistoryActionsEnabled(_settings.ScreenshotHistory.Count > 0);
         _tray.Show();
 
-        // Widget left-click = full screen
         _widget.CaptureRequested += () => DispatchCapture(CaptureMode.FullScreen);
-        // Widget right-click menu
         _widget.CaptureModeRequested += DispatchCapture;
         _widget.SettingsRequested += OnOpenSettings;
+        _widget.MiddleClickRequested += () => DispatchCapture(CaptureMode.ActiveWindow);
+
+        // Global hotkeys
+        _hotkeys = new HotkeyService(_widget);
+        _hotkeys.CaptureModifiers = (uint)_settings.HotkeyCaptureModifiers;
+        _hotkeys.CaptureKey = (uint)_settings.HotkeyCaptureKey;
+        _hotkeys.ActiveWindowModifiers = (uint)_settings.HotkeyActiveWinModifiers;
+        _hotkeys.ActiveWindowKey = (uint)_settings.HotkeyActiveWinKey;
+        _hotkeys.CaptureFullScreenRequested += () => DispatchCapture(CaptureMode.FullScreen);
+        _hotkeys.CaptureActiveWindowRequested += () => DispatchCapture(CaptureMode.ActiveWindow);
+        _hotkeys.Register();
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _hotkeys?.Dispose();
         if (_widget != null && _settings != null)
         {
             _settings.WindowLeft = _widget.Left;
@@ -70,14 +84,27 @@ public partial class App : System.Windows.Application
                 _ => ScreenshotService.CaptureDesktop(),
             };
 
-            if (source == null) return; // user cancelled area selection
+            if (source == null) return;
 
             var folder = AppSettings.EnsureFolder(_settings!.SavePath);
-            var fileName = ScreenshotService.GenerateFileName();
+            var fileName = ScreenshotService.GenerateFileName(_settings.FilenameTemplate);
             var fullPath = Path.Combine(folder, fileName);
+
             ScreenshotService.SaveAsPng(source, fullPath);
             ScreenshotService.CopyToClipboard(source);
 
+            // Play capture sound
+            if (_settings.PlayCaptureSound)
+                PlayShutterSound();
+
+            // Update history
+            _settings.ScreenshotHistory.Add(fullPath);
+            if (_settings.ScreenshotHistory.Count > 20)
+                _settings.ScreenshotHistory.RemoveAt(0);
+            _settings.Save();
+
+            _tray?.UpdateHistory(_settings.ScreenshotHistory);
+            _tray?.SetHistoryActionsEnabled(true);
             _tray?.Notify("OpenShot", $"Saved  \u2022  {fileName}");
         }
         catch (Exception ex)
@@ -90,11 +117,9 @@ public partial class App : System.Windows.Application
         }
     }
 
-    /// <summary>Opens the area-selection overlay. Returns null if cancelled.</summary>
     private static Task<System.Windows.Media.Imaging.BitmapSource?> CaptureAreaAsync()
     {
         var tcs = new TaskCompletionSource<System.Windows.Media.Imaging.BitmapSource?>();
-
         var overlay = new AreaSelectorWindow();
         overlay.SelectionCompleted = rect =>
         {
@@ -102,14 +127,58 @@ public partial class App : System.Windows.Application
                 (int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height);
             tcs.TrySetResult(source);
         };
-
-        overlay.Closed += (_, _) =>
-        {
-            tcs.TrySetResult(null);
-        };
-
+        overlay.Closed += (_, _) => tcs.TrySetResult(null);
         overlay.Show();
         return tcs.Task;
+    }
+
+    // ── Shutter sound ────────────────────────────────────────────────
+
+    private void PlayShutterSound()
+    {
+        try
+        {
+            var asm = System.Reflection.Assembly.GetExecutingAssembly();
+            using var stream = asm.GetManifestResourceStream("OpenShot.Resources.capture.wav");
+            if (stream is not null)
+            {
+                using var player = new SoundPlayer(stream);
+                player.Play();
+            }
+        }
+        catch { /* best-effort */ }
+    }
+
+    // ── History actions ──────────────────────────────────────────────
+
+    private void OnOpenLastScreenshot()
+    {
+        if (_settings == null || _settings.ScreenshotHistory.Count == 0) return;
+        var path = _settings.ScreenshotHistory[^1];
+        if (File.Exists(path))
+            System.Diagnostics.Process.Start("explorer.exe", $"\"{path}\"");
+    }
+
+    private void OnCopyFilePath()
+    {
+        if (_settings == null || _settings.ScreenshotHistory.Count == 0) return;
+        var path = _settings.ScreenshotHistory[^1];
+        try { System.Windows.Clipboard.SetText(path); }
+        catch { /* best-effort */ }
+    }
+
+    private void OnRevealInExplorer()
+    {
+        if (_settings == null || _settings.ScreenshotHistory.Count == 0) return;
+        ScreenshotService.RevealInExplorer(_settings.ScreenshotHistory[^1]);
+    }
+
+    private void OnOpenHistoryItem(int index)
+    {
+        if (_settings == null || index < 0 || index >= _settings.ScreenshotHistory.Count) return;
+        var path = _settings.ScreenshotHistory[index];
+        if (File.Exists(path))
+            System.Diagnostics.Process.Start("explorer.exe", $"\"{path}\"");
     }
 
     // ── Settings window ───────────────────────────────────────────────
@@ -121,9 +190,19 @@ public partial class App : System.Windows.Application
         win.Owner = _widget;
         win.ShowDialog();
 
-        // Re-read settings after dialog closes
         if (_widget != null)
             _widget.Topmost = _settings.AlwaysOnTop;
+
+        // Re-register hotkeys if settings changed
+        _hotkeys?.Unregister();
+        if (_hotkeys != null)
+        {
+            _hotkeys.CaptureModifiers = (uint)_settings.HotkeyCaptureModifiers;
+            _hotkeys.CaptureKey = (uint)_settings.HotkeyCaptureKey;
+            _hotkeys.ActiveWindowModifiers = (uint)_settings.HotkeyActiveWinModifiers;
+            _hotkeys.ActiveWindowKey = (uint)_settings.HotkeyActiveWinKey;
+            _hotkeys.Register();
+        }
     }
 
     // ── Shared handlers ───────────────────────────────────────────────

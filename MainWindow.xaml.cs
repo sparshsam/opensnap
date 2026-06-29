@@ -8,7 +8,7 @@ namespace OpenShot;
 
 /// <summary>
 /// The floating widget — glass capsule. Left-click captures full screen;
-/// right-click opens a quick-mode menu.
+/// right-click opens a quick-mode menu; middle-click captures active window.
 /// </summary>
 public partial class MainWindow : Window
 {
@@ -16,15 +16,13 @@ public partial class MainWindow : Window
     private System.Windows.Point _mouseDownPos;
     private bool _isDragging;
     private const double DragThreshold = 6;
+    private DateTime _lastClickTime = DateTime.MinValue;
+    private const double DoubleClickThresholdMs = 500;
 
-    /// <summary>Raised on left-click (full-screen capture).</summary>
     public event Action? CaptureRequested;
-
-    /// <summary>Raised on right-click menu selection.</summary>
     public event Action<CaptureMode>? CaptureModeRequested;
-
-    /// <summary>Raised when Settings is selected from the context menu.</summary>
     public event Action? SettingsRequested;
+    public event Action? MiddleClickRequested;
 
     public MainWindow(AppSettings settings)
     {
@@ -41,7 +39,6 @@ public partial class MainWindow : Window
 
     private void OnPreviewRightClick(object sender, MouseButtonEventArgs e)
     {
-        // Show the context menu at the cursor position
         CaptureMenu.IsOpen = true;
         e.Handled = true;
     }
@@ -85,13 +82,21 @@ public partial class MainWindow : Window
         Top = y;
     }
 
-    // ── Drag-vs-click ────────────────────────────────────────────────
+    // ── Drag-vs-click (left button) ───────────────────────────────────
 
     private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.LeftButton != MouseButtonState.Pressed) return;
-        _mouseDownPos = e.GetPosition(this);
-        _isDragging = false;
+        if (e.LeftButton == MouseButtonState.Pressed)
+        {
+            _mouseDownPos = e.GetPosition(this);
+            _isDragging = false;
+        }
+        else if (e.MiddleButton == MouseButtonState.Pressed)
+        {
+            // Middle-click: capture active window
+            e.Handled = true;
+            MiddleClickRequested?.Invoke();
+        }
     }
 
     private void OnPreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
@@ -111,11 +116,19 @@ public partial class MainWindow : Window
 
     private void OnPreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (!_isDragging)
+        if (_isDragging) return;
+
+        // Suppress second click of a double-click
+        var now = DateTime.UtcNow;
+        if ((now - _lastClickTime).TotalMilliseconds < DoubleClickThresholdMs)
         {
-            CaptureRequested?.Invoke();
-            FlashFeedback();
+            _lastClickTime = now;
+            return;
         }
+        _lastClickTime = now;
+
+        CaptureRequested?.Invoke();
+        FlashFeedback();
     }
 
     // ── Feedback ──────────────────────────────────────────────────────

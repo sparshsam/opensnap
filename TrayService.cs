@@ -1,20 +1,30 @@
+using System.IO;
 using Forms = System.Windows.Forms;
 
 namespace OpenShot;
 
 /// <summary>
-/// Manages the system-tray icon with a right-click context menu.
+/// Manages the system-tray icon with a right-click context menu,
+/// including screenshot history submenu.
 /// </summary>
 public sealed class TrayService : IDisposable
 {
     private readonly Forms.NotifyIcon _icon;
     private readonly Forms.ContextMenuStrip _menu;
     private readonly Forms.ToolStripMenuItem _startupItem;
+    private readonly Forms.ToolStripMenuItem _historyItem;
+    private readonly Forms.ToolStripMenuItem _openLastItem;
+    private readonly Forms.ToolStripMenuItem _copyPathItem;
+    private readonly Forms.ToolStripMenuItem _revealItem;
 
     public event Action? CaptureRequested;
     public event Action? OpenFolderRequested;
     public event Action? ChangeFolderRequested;
     public event Action<bool>? StartupToggleRequested;
+    public event Action? OpenLastScreenshotRequested;
+    public event Action? CopyFilePathRequested;
+    public event Action? RevealInExplorerRequested;
+    public event Action<int>? OpenHistoryItemRequested;
     public event Action? QuitRequested;
 
     public TrayService()
@@ -37,6 +47,15 @@ public sealed class TrayService : IDisposable
         var changeItem = new Forms.ToolStripMenuItem("Change save folder…");
         changeItem.Click += (_, _) => ChangeFolderRequested?.Invoke();
 
+        // History submenu
+        _historyItem = new Forms.ToolStripMenuItem("Recent screenshots");
+        _openLastItem = new Forms.ToolStripMenuItem("Open last screenshot");
+        _openLastItem.Click += (_, _) => OpenLastScreenshotRequested?.Invoke();
+        _copyPathItem = new Forms.ToolStripMenuItem("Copy file path");
+        _copyPathItem.Click += (_, _) => CopyFilePathRequested?.Invoke();
+        _revealItem = new Forms.ToolStripMenuItem("Reveal in Explorer");
+        _revealItem.Click += (_, _) => RevealInExplorerRequested?.Invoke();
+
         _startupItem = new Forms.ToolStripMenuItem("Launch at startup");
         _startupItem.Click += (_, _) =>
         {
@@ -54,6 +73,11 @@ public sealed class TrayService : IDisposable
             openItem,
             changeItem,
             new Forms.ToolStripSeparator(),
+            _openLastItem,
+            _revealItem,
+            _copyPathItem,
+            _historyItem,
+            new Forms.ToolStripSeparator(),
             _startupItem,
             new Forms.ToolStripSeparator(),
             quitItem,
@@ -63,16 +87,48 @@ public sealed class TrayService : IDisposable
         _icon.DoubleClick += (_, _) => CaptureRequested?.Invoke();
     }
 
-    /// <summary>Sync the checked state of the startup toggle from settings.</summary>
     public void SetStartupChecked(bool enabled)
     {
         _startupItem.Checked = enabled;
     }
 
+    /// <summary>Update the recent-screenshots submenu with the latest entries.</summary>
+    public void UpdateHistory(List<string> history, int maxDisplay = 5)
+    {
+        _historyItem.DropDownItems.Clear();
+
+        if (history.Count == 0)
+        {
+            _historyItem.DropDownItems.Add(new Forms.ToolStripMenuItem("(none)") { Enabled = false });
+            return;
+        }
+
+        int start = Math.Max(0, history.Count - maxDisplay);
+        for (int i = start; i < history.Count; i++)
+        {
+            var fileName = Path.GetFileName(history[i]);
+            var index = i; // capture for closure
+            var item = new Forms.ToolStripMenuItem(fileName);
+            item.Click += (_, _) => OpenHistoryItemRequested?.Invoke(index);
+            _historyItem.DropDownItems.Add(item);
+        }
+    }
+
+    public void SetHistoryActionsEnabled(bool hasHistory)
+    {
+        _openLastItem.Enabled = hasHistory;
+        _revealItem.Enabled = hasHistory;
+        _copyPathItem.Enabled = hasHistory;
+    }
+
     public void Show() => _icon.Visible = true;
     public void Hide() => _icon.Visible = false;
 
-    /// <summary>Load the tray icon from embedded resources (works in single-file publish).</summary>
+    public void Notify(string title, string text)
+    {
+        _icon.ShowBalloonTip(3000, title, text, Forms.ToolTipIcon.Info);
+    }
+
     private static System.Drawing.Icon LoadTrayIcon()
     {
         try
@@ -82,18 +138,9 @@ public sealed class TrayService : IDisposable
             if (stream is not null)
                 return new System.Drawing.Icon(stream);
         }
-        catch
-        {
-            // Fall through to default
-        }
+        catch { }
         return System.Drawing.Icon.ExtractAssociatedIcon(
             System.Diagnostics.Process.GetCurrentProcess().MainModule!.FileName)!;
-    }
-
-    /// <summary>Show a balloon tip notification.</summary>
-    public void Notify(string title, string text)
-    {
-        _icon.ShowBalloonTip(3000, title, text, Forms.ToolTipIcon.Info);
     }
 
     public void Dispose()
