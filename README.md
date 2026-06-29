@@ -27,8 +27,7 @@ to your Desktop, and copy it to your clipboard — all in one click.
 ## Prerequisites
 
 - Windows 10 / 11
-- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) with
-  the **Desktop development with .NET** workload
+- [.NET 8 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) or SDK installed on the system
 
 ## Build
 
@@ -38,29 +37,21 @@ dotnet restore
 dotnet build -c Release
 ```
 
-## Publish (standalone exe)
+## Publish (framework-dependent — fast, small)
 
 ```cmd
-dotnet publish -c Release -r win-x64 --self-contained true ^
-  -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true ^
-  -o publish
+dotnet publish -c Release -o release
 ```
 
-This produces a single `OpenShot.exe` in the `publish\` folder that can run on
-any Windows machine without the .NET runtime installed.
+The output `release\OpenShot.exe` is ~170 KB and launches instantly. Requires
+the .NET 8 runtime to be installed on the target machine (not bundled).
 
-## Install / Run
+## Run
 
-1. **From source:**
-   ```cmd
-   dotnet run -c Release
-   ```
+Double-click `OpenShot.lnk` on the desktop, or run:
 
-2. **From published exe:**
-   Run `publish\OpenShot.exe` directly.
-
-A desktop shortcut to the published exe is created at:
-`C:\Users\spars\Desktop\OpenShot.lnk`
+```cmd
+dotnet run -c Release
 
 ## Startup behavior
 

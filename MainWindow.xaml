@@ -25,7 +25,7 @@
                           Color="#000000" />
     </Window.Resources>
 
-    <!-- Single unified dark capsule — the entire surface is the action target -->
+    <!-- Single unified dark capsule — click anywhere to capture, drag anywhere to move -->
     <Border x:Name="RootCapsule"
             Width="80"
             Height="36"
@@ -34,16 +34,17 @@
             BorderBrush="#555555"
             BorderThickness="1"
             Effect="{StaticResource WidgetShadow}"
-            Cursor="Hand">
+            Cursor="Hand"
+            Padding="0">
 
-        <!-- Camera icon centered as the identity mark -->
-        <Viewbox Width="17"
-                 Height="17"
+        <!-- Camera icon centred in the capsule -->
+        <Viewbox Width="18"
+                 Height="18"
                  Stretch="Uniform"
                  HorizontalAlignment="Center"
                  VerticalAlignment="Center">
             <Path Fill="#C0C0C0"
-                  Data="M9,3 L12,3 L13,6 L18,6 C19,6 20,7 20,8 L20,17 C20,18 19,19 18,19 L6,19 C5,19 4,18 4,17 L4,8 C4,7 5,6 6,6 L11,6 L12,3 Z M12,9 C10,9 9,10 9,12 C9,14 10,15 12,15 C14,15 15,14 15,12 C15,10 14,9 12,9 Z" />
+                  Data="M12,3.5 L14.5,3.5 L16,6.5 L20,6.5 C21.1,6.5 22,7.4 22,8.5 L22,18.5 C22,19.6 21.1,20.5 20,20.5 L4,20.5 C2.9,20.5 2,19.6 2,18.5 L2,8.5 C2,7.4 2.9,6.5 4,6.5 L8,6.5 L9.5,3.5 Z M12,9.5 C9.8,9.5 8,11.3 8,13.5 C8,15.7 9.8,17.5 12,17.5 C14.2,17.5 16,15.7 16,13.5 C16,11.3 14.2,9.5 12,9.5 Z" />
         </Viewbox>
     </Border>
 </Window>

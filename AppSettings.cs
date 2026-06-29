@@ -33,7 +33,19 @@ public sealed class AppSettings
 
             var json = File.ReadAllText(SettingsPath);
             var settings = JsonSerializer.Deserialize<AppSettings>(json);
-            return settings ?? new AppSettings();
+            settings ??= new AppSettings();
+
+            // Migrate old default path to Desktop
+            var picturesPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+                "Screenshots",
+                "OpenShot");
+            if (settings.SavePath.Equals(picturesPath, StringComparison.OrdinalIgnoreCase))
+            {
+                settings.SavePath = GetDefaultSavePath();
+            }
+
+            return settings;
         }
         catch
         {
