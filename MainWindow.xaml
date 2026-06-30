@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="OpenSnap"
-        Width="80"
+        Width="240"
         Height="36"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -31,6 +31,14 @@
             <GradientStop Offset="0.4" Color="#12FFFFFF" />
             <GradientStop Offset="1.0" Color="#00000000" />
         </LinearGradientBrush>
+
+        <SolidColorBrush x:Key="HoverBg" Color="#18FFFFFF" />
+        <SolidColorBrush x:Key="ToggleActiveBg" Color="#334A9EFF" />
+        <SolidColorBrush x:Key="ToggleActiveBorder" Color="#664A9EFF" />
+        <SolidColorBrush x:Key="IconColor" Color="#D0D0D0" />
+        <SolidColorBrush x:Key="IconHoverColor" Color="#F0F0F0" />
+        <SolidColorBrush x:Key="IconToggleColor" Color="#4A9EFF" />
+        <SolidColorBrush x:Key="DividerColor" Color="#18FFFFFF" />
     </Window.Resources>
 
     <!-- Right-click context menu -->
@@ -43,12 +51,14 @@
             <MenuItem Header="Capture + OCR" Tag="CaptureOcr" Click="OnMenuCapture" />
             <Separator />
             <MenuItem Header="Settings…" Tag="Settings" Click="OnMenuCapture" />
+            <Separator />
+            <MenuItem Header="Exit" Tag="Exit" Click="OnMenuCapture" />
         </ContextMenu>
     </Window.ContextMenu>
 
     <Grid Background="Transparent">
         <Border x:Name="RootCapsule"
-                Width="80"
+                Width="240"
                 Height="36"
                 Background="#1AFFFFFF"
                 CornerRadius="18"
@@ -58,20 +68,97 @@
                 Cursor="Hand">
 
             <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Shared glass highlight behind all sections -->
                 <Border Background="{StaticResource GlassHighlight}"
                         CornerRadius="18"
                         Opacity="0.6"
                         IsHitTestVisible="False" />
 
-                <Viewbox Width="18"
-                         Height="18"
-                         Stretch="Uniform"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"
-                         IsHitTestVisible="False">
-                    <Path Fill="#D0D0D0"
-                          Data="M12,3.5 L14.5,3.5 L16,6.5 L20,6.5 C21.1,6.5 22,7.4 22,8.5 L22,18.5 C22,19.6 21.1,20.5 20,20.5 L4,20.5 C2.9,20.5 2,19.6 2,18.5 L2,8.5 C2,7.4 2.9,6.5 4,6.5 L8,6.5 L9.5,3.5 Z M12,9.5 C9.8,9.5 8,11.3 8,13.5 C8,15.7 9.8,17.5 12,17.5 C14.2,17.5 16,15.7 16,13.5 C16,11.3 14.2,9.5 12,9.5 Z" />
-                </Viewbox>
+                <!-- ───────── Column 0: Area selection (toggle) ───────── -->
+                <Border x:Name="AreaSection"
+                        Grid.Column="0"
+                        CornerRadius="18,0,0,18"
+                        Background="Transparent"
+                        RenderTransformOrigin="0.5,0.5"
+                        MouseEnter="OnAreaMouseEnter"
+                        MouseLeave="OnAreaMouseLeave"
+                        ToolTip="Area selection">
+                    <Viewbox Width="18"
+                             Height="18"
+                             Stretch="Uniform"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             IsHitTestVisible="False">
+                        <Path x:Name="AreaIconPath"
+                              Fill="{StaticResource IconColor}"
+                              Data="M4,4 L20,4 L20,20 L4,20 Z M7,7 L17,7 L17,17 L7,17 Z" />
+                    </Viewbox>
+                </Border>
+
+                <!-- Divider 1 -->
+                <Rectangle Grid.Column="0"
+                           Width="1"
+                           Height="20"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Fill="{StaticResource DividerColor}"
+                           IsHitTestVisible="False" />
+
+                <!-- ───────── Column 1: Full screen (default) ────────── -->
+                <Border x:Name="FullSection"
+                        Grid.Column="1"
+                        Background="Transparent"
+                        RenderTransformOrigin="0.5,0.5"
+                        MouseEnter="OnFullMouseEnter"
+                        MouseLeave="OnFullMouseLeave"
+                        ToolTip="Full screen capture">
+                    <Viewbox Width="18"
+                             Height="18"
+                             Stretch="Uniform"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             IsHitTestVisible="False">
+                        <Path x:Name="FullIconPath"
+                              Fill="{StaticResource IconColor}"
+                              Data="M12,3.5 L14.5,3.5 L16,6.5 L20,6.5 C21.1,6.5 22,7.4 22,8.5 L22,18.5 C22,19.6 21.1,20.5 20,20.5 L4,20.5 C2.9,20.5 2,19.6 2,18.5 L2,8.5 C2,7.4 2.9,6.5 4,6.5 L8,6.5 L9.5,3.5 Z M12,9.5 C9.8,9.5 8,11.3 8,13.5 C8,15.7 9.8,17.5 12,17.5 C14.2,17.5 16,15.7 16,13.5 C16,11.3 14.2,9.5 12,9.5 Z" />
+                    </Viewbox>
+                </Border>
+
+                <!-- Divider 2 -->
+                <Rectangle Grid.Column="1"
+                           Width="1"
+                           Height="20"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Fill="{StaticResource DividerColor}"
+                           IsHitTestVisible="False" />
+
+                <!-- ───────── Column 2: Active window ────────────────── -->
+                <Border x:Name="WinSection"
+                        Grid.Column="2"
+                        CornerRadius="0,18,18,0"
+                        Background="Transparent"
+                        RenderTransformOrigin="0.5,0.5"
+                        MouseEnter="OnWinMouseEnter"
+                        MouseLeave="OnWinMouseLeave"
+                        ToolTip="Active window capture">
+                    <Viewbox Width="18"
+                             Height="18"
+                             Stretch="Uniform"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             IsHitTestVisible="False">
+                        <Path x:Name="WinIconPath"
+                              Fill="{StaticResource IconColor}"
+                              Data="M3,5 C3,3.9 3.9,3 5,3 L19,3 C20.1,3 21,3.9 21,5 L21,19 C21,20.1 20.1,21 19,21 L5,21 C3.9,21 3,20.1 3,19 Z M3,8 L21,8" />
+                    </Viewbox>
+                </Border>
             </Grid>
         </Border>
     </Grid>

@@ -46,6 +46,7 @@ public partial class App : System.Windows.Application
         _widget.CaptureModeRequested += DispatchCapture;
         _widget.SettingsRequested += OnOpenSettings;
         _widget.MiddleClickRequested += () => DispatchCapture(CaptureMode.ActiveWindow);
+        _widget.ExitRequested += OnQuit;
 
         // Global hotkeys
         _hotkeys = new HotkeyService(_widget);
@@ -84,6 +85,9 @@ public partial class App : System.Windows.Application
             // GetForegroundWindow() returns the window behind it.
             if (mode == CaptureMode.ActiveWindow)
             {
+                // Yield so the bounce animation gets a render frame
+                // before the widget disappears.
+                await Task.Delay(1);
                 _widget?.Hide();
                 await Task.Delay(50); // let Win32 process foreground change
                 source = CaptureService.CaptureActiveWindow();
@@ -97,6 +101,10 @@ public partial class App : System.Windows.Application
                     _ => ScreenshotService.CaptureDesktop(),
                 };
             }
+
+            // Deactivate area-selection toggle after the overlay closes
+            if (mode == CaptureMode.AreaSelection)
+                _widget?.ResetAreaToggle();
 
             if (source == null) return;
 
