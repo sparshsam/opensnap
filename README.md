@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/stable-v1.0.0-007a3f?style=for-the-badge" alt="v1.0.0">
   <a href="https://github.com/sparshsam/opensnap/releases/latest">
     <img src="https://img.shields.io/badge/download-latest%20release-007a3f?style=for-the-badge&logo=github" alt="Download">
   </a>
@@ -119,6 +120,7 @@ v0.6  ·  Installer, About dialog, settings fixes     Mar 2025
 v0.7  ·  Triple-button pill, bounce, green flash     Jun 2026
 v0.8  ·  Quick actions, naming, history pinning      Jun 2026
 v0.9  ·  Languages, accessibility, auto-update       Jun 2026
+v1.0  ·  Stable release — polished, documented       Jun 2026
 ```
 
 Full changelog → [CHANGELOG.md](CHANGELOG.md)
