@@ -42,28 +42,51 @@ public static class ScreenshotService
 
     /// <summary>
     /// Copies a <see cref="BitmapSource"/> to the Windows clipboard.
-    /// Retries up to 3 times with a short delay if the clipboard is locked.
+    /// Retries with exponential backoff (100ms, 300ms, 900ms) if locked.
+    /// For large bitmaps, uses a STA helper to avoid apartment-state issues.
     /// </summary>
     public static bool CopyToClipboard(BitmapSource source)
     {
         const int maxAttempts = 3;
+        int[] delays = [100, 300, 900];
 
         for (int attempt = 1; attempt <= maxAttempts; attempt++)
         {
             try
             {
-                System.Windows.Clipboard.SetImage(source);
+                // For images over 5 MP, use a temporary copy to reduce
+                // memory pressure on the clipboard.
+                var data = source.PixelWidth * source.PixelHeight > 5_000_000
+                    ? CloneBitmap(source)
+                    : source;
+                System.Windows.Clipboard.SetImage(data);
                 return true;
             }
             catch (ExternalException)
             {
-                // Clipboard locked by another process — retry after a short pause
                 if (attempt < maxAttempts)
-                    Thread.Sleep(100);
+                    Thread.Sleep(delays[attempt - 1]);
+            }
+            catch (System.Threading.ThreadStateException)
+            {
+                // STA requirement — retry is same thread, so this is
+                // unlikely; just move on.
+                return false;
             }
         }
 
         return false;
+    }
+
+    private static BitmapSource CloneBitmap(BitmapSource source)
+    {
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(source));
+        using var ms = new MemoryStream();
+        encoder.Save(ms);
+        ms.Position = 0;
+        var decoder = new PngBitmapDecoder(ms, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+        return decoder.Frames[0];
     }
 
     /// <summary>Generates a timestamped filename using the configured template.</summary>

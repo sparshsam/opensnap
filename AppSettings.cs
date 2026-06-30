@@ -37,6 +37,16 @@ public sealed class AppSettings
     // v0.4.0 — history (last 20 file paths)
     public List<string> ScreenshotHistory { get; set; } = new();
 
+    // v0.7.0 — opacity (20–100%)
+    public double Opacity { get; set; } = 1.0;
+
+    // v0.7.0 — edge snapping
+    public bool EdgeSnapEnabled { get; set; } = true;
+    public int EdgeSnapThreshold { get; set; } = 10;
+
+    // v0.7.0 — auto-hide when fullscreen app is active
+    public bool AutoHideFullscreen { get; set; } = false;
+
     // ── Serialisation ─────────────────────────────────────────────────
 
     public static AppSettings Load()

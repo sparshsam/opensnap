@@ -41,6 +41,8 @@ public partial class SettingsWindow : Window
         PopulateKeyCombos();
     }
 
+    public event Action? VisualSettingsChanged;
+
     private void PopulateKeyCombos()
     {
         foreach (var (name, vk) in KeyEntries)
@@ -59,6 +61,12 @@ public partial class SettingsWindow : Window
         AlwaysOnTopCheck.IsChecked = _settings.AlwaysOnTop;
         LaunchAtStartupCheck.IsChecked = _settings.LaunchAtStartup;
         PlaySoundCheck.IsChecked = _settings.PlayCaptureSound;
+        EdgeSnapCheck.IsChecked = _settings.EdgeSnapEnabled;
+        AutoHideCheck.IsChecked = _settings.AutoHideFullscreen;
+
+        // Opacity
+        OpacitySlider.Value = _settings.Opacity;
+        OpacityLabel.Text = $"{(int)(_settings.Opacity * 100)}%";
 
         // Filename template
         TemplateBox.Text = _settings.FilenameTemplate;
@@ -137,9 +145,12 @@ public partial class SettingsWindow : Window
         _settings.AlwaysOnTop = AlwaysOnTopCheck.IsChecked ?? true;
         _settings.LaunchAtStartup = LaunchAtStartupCheck.IsChecked ?? false;
         _settings.PlayCaptureSound = PlaySoundCheck.IsChecked ?? true;
+        _settings.EdgeSnapEnabled = EdgeSnapCheck.IsChecked ?? true;
+        _settings.AutoHideFullscreen = AutoHideCheck.IsChecked ?? false;
         _settings.Save();
 
         StartupManager.SetStartup(_settings.LaunchAtStartup);
+        VisualSettingsChanged?.Invoke();
     }
 
     private void OnHotkeyChanged(object sender, SelectionChangedEventArgs e)
@@ -167,6 +178,15 @@ public partial class SettingsWindow : Window
 
         _settings.FilenameTemplate = TemplateBox.Text;
         _settings.Save();
+    }
+
+    private void OnOpacityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (_suppressToggle) return;
+        _settings.Opacity = Math.Round(e.NewValue, 2);
+        OpacityLabel.Text = $"{(int)(_settings.Opacity * 100)}%";
+        _settings.Save();
+        VisualSettingsChanged?.Invoke();
     }
 
     private void OnClose(object sender, RoutedEventArgs e)

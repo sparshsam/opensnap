@@ -30,17 +30,16 @@ public partial class MainWindow : Window
 
     // ── Events fired to App ─────────────────────────────────────────
 
-    /// <summary>Fired for full-screen capture (center button, or menu).</summary>
+    /// <summary>Fired for full-screen capture.</summary>
     public event Action? CaptureRequested;
-
-    /// <summary>Fired for area / active-window / OCR capture (menu or buttons).</summary>
+    /// <summary>Fired for area / active-window / OCR capture.</summary>
     public event Action<CaptureMode>? CaptureModeRequested;
-
     public event Action? SettingsRequested;
     public event Action? MiddleClickRequested;
-
     /// <summary>Fired when the user picks Exit from the context menu.</summary>
     public event Action? ExitRequested;
+    /// <summary>Fired when the widget finishes a drag (for snapping).</summary>
+    public event Action? DragEnded;
 
     // Section boundaries within the 240 px pill
     private const double AreaSectionEnd = 80;
@@ -51,23 +50,41 @@ public partial class MainWindow : Window
         _settings = settings;
         InitializeComponent();
 
-        // Pre-assign ScaleTransforms so BounceSection can animate them
-        // immediately without a null-to-instance transition.
+        // Pre-assign ScaleTransforms for per-section bounce
         AreaSection.RenderTransform = new ScaleTransform(1.0, 1.0);
         FullSection.RenderTransform = new ScaleTransform(1.0, 1.0);
         WinSection.RenderTransform  = new ScaleTransform(1.0, 1.0);
 
-        // React to per-monitor DPI changes (PerMonitorV2 manifest).
-        // WPF auto-scales content; we re-clamp window position.
         DpiChanged += OnDpiChanged;
     }
 
-    private void OnDpiChanged(object? sender, System.Windows.DpiChangedEventArgs e)
+    // ── Public API for App.xaml.cs ─────────────────────────────────────
+
+    /// <summary>Reapply visual settings (opacity, etc.) after settings dialog.</summary>
+    public void ApplySettings()
     {
-        ClampToVisibleScreen();
+        Opacity = _settings.Opacity;
+        Topmost = _settings.AlwaysOnTop;
     }
 
+    /// <summary>Hide/show for fullscreen-auto-hide.</summary>
+    public void SetWidgetVisible(bool visible)
+    {
+        if (visible && Visibility != Visibility.Visible)
+            Show();
+        else if (!visible && Visibility == Visibility.Visible)
+            Hide();
+    }
+
+    // ── Lifecycle ─────────────────────────────────────────────────────
+
     private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        ClampToVisibleScreen();
+        Opacity = _settings.Opacity;
+    }
+
+    private void OnDpiChanged(object? sender, System.Windows.DpiChangedEventArgs e)
     {
         ClampToVisibleScreen();
     }
@@ -82,29 +99,16 @@ public partial class MainWindow : Window
 
     private void OnMenuCapture(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuItem item || item.Tag is not string tag)
-            return;
+        if (sender is not MenuItem item || item.Tag is not string tag) return;
 
         switch (tag)
         {
-            case "FullScreen":
-                CaptureRequested?.Invoke();
-                break;
-            case "ActiveWindow":
-                CaptureModeRequested?.Invoke(CaptureMode.ActiveWindow);
-                break;
-            case "AreaSelection":
-                ToggleAreaMode();
-                break;
-            case "CaptureOcr":
-                CaptureModeRequested?.Invoke(CaptureMode.CaptureOcr);
-                break;
-            case "Settings":
-                SettingsRequested?.Invoke();
-                break;
-            case "Exit":
-                ExitRequested?.Invoke();
-                break;
+            case "FullScreen":          CaptureRequested?.Invoke(); break;
+            case "ActiveWindow":        CaptureModeRequested?.Invoke(CaptureMode.ActiveWindow); break;
+            case "AreaSelection":       ToggleAreaMode(); break;
+            case "CaptureOcr":          CaptureModeRequested?.Invoke(CaptureMode.CaptureOcr); break;
+            case "Settings":            SettingsRequested?.Invoke(); break;
+            case "Exit":                ExitRequested?.Invoke(); break;
         }
     }
 
@@ -123,6 +127,24 @@ public partial class MainWindow : Window
 
         Left = x;
         Top = y;
+    }
+
+    // ── Edge snapping ─────────────────────────────────────────────────
+
+    /// <summary>After a drag finishes, snap to screen edges if enabled.</summary>
+    private void ApplyEdgeSnap()
+    {
+        if (!_settings.EdgeSnapEnabled) return;
+
+        var wa = System.Windows.Forms.Screen.PrimaryScreen!.WorkingArea;
+        int t = _settings.EdgeSnapThreshold;
+
+        // Each edge independently
+        if (Math.Abs(Left - wa.Left) < t) Left = wa.Left;
+        else if (Math.Abs(Left + Width - wa.Right) < t) Left = wa.Right - Width;
+
+        if (Math.Abs(Top - wa.Top) < t) Top = wa.Top;
+        else if (Math.Abs(Top + Height - wa.Bottom) < t) Top = wa.Bottom - Height;
     }
 
     // ── Which section was hit? ────────────────────────────────────────
@@ -164,7 +186,13 @@ public partial class MainWindow : Window
 
     private void OnPreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (_isDragging) return;
+        if (_isDragging)
+        {
+            _isDragging = false;
+            ApplyEdgeSnap();
+            DragEnded?.Invoke();
+            return;
+        }
 
         // Suppress second click of a double-click
         var now = DateTime.UtcNow;
@@ -175,44 +203,26 @@ public partial class MainWindow : Window
         }
         _lastClickTime = now;
 
-        // Dispatch based on section — play visual feedback FIRST
-        // so the animation renders before capture blocks the UI thread.
+        // Dispatch based on section
         var clickPos = e.GetPosition(this);
         switch (GetSectionIndex(clickPos.X))
         {
-            case 0:
-                BounceSection(AreaSection);
-                ToggleAreaMode();
-                break;
-            case 1:
-                BounceSection(FullSection);
-                FlashFeedback();
-                CaptureRequested?.Invoke();
-                break;
-            case 2:
-                BounceSection(WinSection);
-                FlashFeedback();
-                CaptureModeRequested?.Invoke(CaptureMode.ActiveWindow);
-                break;
+            case 0: BounceSection(AreaSection); ToggleAreaMode(); break;
+            case 1: BounceSection(FullSection); FlashFeedback(); CaptureRequested?.Invoke(); break;
+            case 2: BounceSection(WinSection); FlashFeedback(); CaptureModeRequested?.Invoke(CaptureMode.ActiveWindow); break;
         }
     }
 
     // ── Area selection toggle ──────────────────────────────────────────
 
-    /// <summary>Toggles the area-selection mode on/off and fires the capture event.</summary>
     private void ToggleAreaMode()
     {
         _areaToggleActive = !_areaToggleActive;
         ApplyAreaVisual();
-
         if (_areaToggleActive)
             CaptureModeRequested?.Invoke(CaptureMode.AreaSelection);
     }
 
-    /// <summary>
-    /// Called by <see cref="App"/> after the area-selection overlay
-    /// completes or is cancelled, to deactivate the toggle state.
-    /// </summary>
     public void ResetAreaToggle()
     {
         if (!_areaToggleActive) return;
@@ -249,71 +259,38 @@ public partial class MainWindow : Window
 
     private void OnAreaMouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        if (_areaToggleActive)
-            ApplyAreaVisual();
-        else
-        {
-            AreaSection.Background = Brushes.Transparent;
-            AreaIconPath.Fill = (Brush)FindResource("IconColor");
-        }
+        if (_areaToggleActive) ApplyAreaVisual();
+        else { AreaSection.Background = Brushes.Transparent; AreaIconPath.Fill = (Brush)FindResource("IconColor"); }
     }
 
     private void OnFullMouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-    {
-        FullSection.Background = (Brush)FindResource("HoverBg");
-        FullIconPath.Fill = (Brush)FindResource("IconHoverColor");
-    }
+    { FullSection.Background = (Brush)FindResource("HoverBg"); FullIconPath.Fill = (Brush)FindResource("IconHoverColor"); }
 
     private void OnFullMouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-    {
-        FullSection.Background = Brushes.Transparent;
-        FullIconPath.Fill = (Brush)FindResource("IconColor");
-    }
+    { FullSection.Background = Brushes.Transparent; FullIconPath.Fill = (Brush)FindResource("IconColor"); }
 
     private void OnWinMouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-    {
-        WinSection.Background = (Brush)FindResource("HoverBg");
-        WinIconPath.Fill = (Brush)FindResource("IconHoverColor");
-    }
+    { WinSection.Background = (Brush)FindResource("HoverBg"); WinIconPath.Fill = (Brush)FindResource("IconHoverColor"); }
 
     private void OnWinMouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-    {
-        WinSection.Background = Brushes.Transparent;
-        WinIconPath.Fill = (Brush)FindResource("IconColor");
-    }
+    { WinSection.Background = Brushes.Transparent; WinIconPath.Fill = (Brush)FindResource("IconColor"); }
 
     // ── Feedback ──────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Spring-back bounce on the pressed section — scales down then
-    /// overshoots past 1.0 with a BackEase curve before settling.
-    /// Animates the ScaleTransform <b>instance</b> so the transform
-    /// is scoped to the individual section, not the parent capsule.
-    /// </summary>
     private void BounceSection(FrameworkElement element)
     {
-        // Ensure a local ScaleTransform exists for this element
         if (element.RenderTransform is not ScaleTransform scale)
-        {
-            scale = new ScaleTransform(1.0, 1.0);
-            element.RenderTransform = scale;
-        }
+        { scale = new ScaleTransform(1.0, 1.0); element.RenderTransform = scale; }
 
-        // Animate the ScaleTransform instance directly (not the element)
-        // so ScaleXProperty resolves on the correct dependency object.
         var bounce = new DoubleAnimation
         {
-            From = 0.85,
-            To = 1.0,
-            Duration = TimeSpan.FromMilliseconds(400),
+            From = 0.85, To = 1.0, Duration = TimeSpan.FromMilliseconds(400),
             EasingFunction = new BackEase { Amplitude = 0.5, EasingMode = EasingMode.EaseOut },
         };
-
         scale.BeginAnimation(ScaleTransform.ScaleXProperty, bounce);
         scale.BeginAnimation(ScaleTransform.ScaleYProperty, bounce);
     }
 
-    /// <summary>Brief green border flash around the capsule after a capture.</summary>
     private void FlashFeedback()
     {
         var flash = new ColorAnimation
@@ -322,7 +299,6 @@ public partial class MainWindow : Window
             To   = Color.FromRgb(0x00, 0xCC, 0x66),
             Duration = TimeSpan.FromMilliseconds(300),
         };
-
         var brush = new SolidColorBrush(Color.FromRgb(0x00, 0x7A, 0x3F));
         RootCapsule.BorderBrush = brush;
         brush.BeginAnimation(SolidColorBrush.ColorProperty, flash);

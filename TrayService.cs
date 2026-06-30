@@ -121,6 +121,7 @@ public sealed class TrayService : IDisposable
         _copyPathItem.Enabled = hasHistory;
     }
 
+    public bool IsVisible => _icon.Visible;
     public void Show() => _icon.Visible = true;
     public void Hide() => _icon.Visible = false;
 
