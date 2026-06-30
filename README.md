@@ -1,7 +1,9 @@
-<picture align="center">
-  <source media="(prefers-color-scheme: dark)" srcset="assets/branding/logo-white.svg">
-  <img src="assets/branding/logo-on-black.png" width="64" alt="OpenSnap">
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/branding/logo-white.svg">
+    <img src="assets/branding/logo-on-black.png" width="64" alt="OpenSnap">
+  </picture>
+</p>
 
 <h1 align="center">OpenSnap</h1>
 
