@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.0.0 — Stable Release (Jun 2026)
+
+- Repo made public
+- Stable branch, issue templates, SECURITY.md, CODE_OF_CONDUCT.md
+- Full contributor and developer documentation
+- QA checklist, FAQ, troubleshooting guide
+- MSIX packaging, Partner Center-ready
+- Everything from v0.8 through v0.9.5 included and finalised
+
 ## v0.9.5 — Accessibility & Localization (Jun 2026)
 
 - Keyboard navigation (arrow keys + Enter/Space)

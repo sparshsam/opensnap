@@ -3,7 +3,7 @@
 C# WPF screenshot widget for Windows. `net8.0-windows10.0.19041.0`.
 
 **GitHub:** https://github.com/sparshsam/opensnap
-**Latest tag:** v0.9.5
+**Latest tag:** v1.0.0
 **Stable branch:** `stable`
 
 ---
