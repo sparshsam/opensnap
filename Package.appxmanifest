@@ -5,19 +5,19 @@
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap rescap">
 
-  <Identity Name="OpenSnap"
+  <Identity Name="SparshSam.OpenSnap"
             Publisher="CN=E6186421-BF8A-47E0-A89C-0F513DFF91C0"
-            Version="0.9.0.0" />
+            Version="1.0.0.0" />
 
   <Properties>
     <DisplayName>OpenSnap</DisplayName>
-    <PublisherDisplayName>Sparsh</PublisherDisplayName>
+    <PublisherDisplayName>Sparsh Sam</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <Description>A minimal, always-on-top desktop screenshot widget for Windows.</Description>
   </Properties>
 
   <Resources>
-    <Resource Language="x-generate" />
+    <Resource Language="en-us" />
   </Resources>
 
   <Dependencies>
