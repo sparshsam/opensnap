@@ -129,6 +129,23 @@ public sealed class TrayService : IDisposable
         _icon.ShowBalloonTip(3000, title, text, Forms.ToolTipIcon.Info);
     }
 
+    /// <summary>Show a balloon tip that opens a URL when clicked.</summary>
+    public void NotifyWithLink(string title, string text, string url)
+    {
+        // Wire a one-shot click handler that opens the URL
+        BalloonTipClicked handler = null!;
+        handler = (_, _) =>
+        {
+            _icon.BalloonTipClicked -= handler;
+            try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true }); }
+            catch { /* best-effort */ }
+        };
+        _icon.BalloonTipClicked += handler;
+        _icon.ShowBalloonTip(3000, title, text, Forms.ToolTipIcon.Info);
+    }
+
+    private delegate void BalloonTipClicked(object? sender, EventArgs e);
+
     private static System.Drawing.Icon LoadTrayIcon()
     {
         try

@@ -9,12 +9,17 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>Resources\app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>OpenSnap</AssemblyName>
     <RootNamespace>OpenSnap</RootNamespace>
-    <Version>0.6.0</Version>
+    <Version>0.7.0</Version>
     <Description>A minimal floating screenshot widget for Windows.</Description>
     <Authors>Sparsh</Authors>
     <Product>OpenSnap</Product>
+
+    <!-- MSIX packaging support (requires Windows SDK) -->
+    <WindowsPackageType>None</WindowsPackageType>
+    <AppxPackage>false</AppxPackage>
   </PropertyGroup>
 
   <ItemGroup>

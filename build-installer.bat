@@ -4,7 +4,7 @@ REM Usage: build-installer.bat
 REM Prerequisites: Inno Setup 6 at C:\Program Files (x86)\Inno Setup 6
 
 setlocal
-set VERSION=0.6.0
+set VERSION=0.7.0
 set PROJECT_DIR=C:\Users\spars\repos\opensnap
 set ISS="C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 

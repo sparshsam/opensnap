@@ -2,7 +2,7 @@
 ; Build: ISCC.exe setup.iss
 
 #define MyAppName "OpenSnap"
-#define MyAppVersion "0.6.0"
+#define MyAppVersion "0.7.0"
 #define MyAppPublisher "Sparsh"
 #define MyAppURL "https://github.com/sparshsam/opensnap"
 #define MyAppExeName "OpenSnap.exe"
@@ -29,6 +29,13 @@ PrivilegesRequired=lowest
 CloseApplications=force
 DisableWelcomePage=no
 DisableFinishedPage=no
+ShowLanguageDialog=no
+AppCopyright=© {#MyAppPublisher}
+
+; Branding — place 164×314 WizardSmallImageFile and 55×58 WizardImageFile
+; in Resources/ to replace the default Inno Setup graphics.
+; WizardSmallImageFile=Resources\wizard-small.bmp
+; WizardImageFile=Resources\wizard-large.bmp
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

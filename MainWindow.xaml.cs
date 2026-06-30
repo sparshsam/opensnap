@@ -56,6 +56,15 @@ public partial class MainWindow : Window
         AreaSection.RenderTransform = new ScaleTransform(1.0, 1.0);
         FullSection.RenderTransform = new ScaleTransform(1.0, 1.0);
         WinSection.RenderTransform  = new ScaleTransform(1.0, 1.0);
+
+        // React to per-monitor DPI changes (PerMonitorV2 manifest).
+        // WPF auto-scales content; we re-clamp window position.
+        DpiChanged += OnDpiChanged;
+    }
+
+    private void OnDpiChanged(object? sender, DpiChangedEventArgs e)
+    {
+        ClampToVisibleScreen();
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)

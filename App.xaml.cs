@@ -11,6 +11,7 @@ public partial class App : System.Windows.Application
     private AppSettings? _settings;
     private MainWindow? _widget;
     private HotkeyService? _hotkeys;
+    private UpdateService? _updater;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -57,6 +58,10 @@ public partial class App : System.Windows.Application
         _hotkeys.CaptureFullScreenRequested += () => DispatchCapture(CaptureMode.FullScreen);
         _hotkeys.CaptureActiveWindowRequested += () => DispatchCapture(CaptureMode.ActiveWindow);
         _hotkeys.Register();
+
+        // Background update check (silent if up-to-date).
+        _updater = new UpdateService(_tray);
+        _ = _updater.CheckAsync();
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -156,8 +161,14 @@ public partial class App : System.Windows.Application
         var overlay = new AreaSelectorWindow();
         overlay.SelectionCompleted = rect =>
         {
+            // Convert window-relative coords to screen-absolute coords
+            // (the overlay spans the virtual desktop starting at
+            //  VirtualScreenLeft/Top, and GetPosition() is
+            //  window-content-relative).
             var source = CaptureService.CaptureArea(
-                (int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height);
+                (int)(overlay.Left + rect.X),
+                (int)(overlay.Top + rect.Y),
+                (int)rect.Width, (int)rect.Height);
             tcs.TrySetResult(source);
         };
         overlay.Closed += (_, _) => tcs.TrySetResult(null);

@@ -23,9 +23,10 @@ public partial class AreaSelectorWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        // Full-screen overlay — window already covers all monitors
-        Left = 0;
-        Top = 0;
+        // Cover the entire virtual desktop (including monitors to the
+        // left or above the primary display).
+        Left = SystemParameters.VirtualScreenLeft;
+        Top = SystemParameters.VirtualScreenTop;
         Width = SystemParameters.VirtualScreenWidth;
         Height = SystemParameters.VirtualScreenHeight;
     }
