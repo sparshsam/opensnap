@@ -28,6 +28,17 @@ public partial class MainWindow : Window
     // Toggle state for the area-selection left button
     private bool _areaToggleActive;
 
+    // ── Press-animation state ──────────────────────────────────────────
+
+    private static readonly TimeSpan PressDuration = TimeSpan.FromMilliseconds(50);
+    private static readonly TimeSpan ReleaseDuration = TimeSpan.FromMilliseconds(100);
+    private const double PressScale = 0.97;
+
+    private readonly SolidColorBrush? _capsuleBg;
+    private readonly DropShadowEffect? _capsuleShadow;
+    private readonly Color _defaultBgColor;
+    private readonly double _defaultShadowOpacity;
+
     // ── Events fired to App ─────────────────────────────────────────
 
     /// <summary>Fired for full-screen capture.</summary>
@@ -50,10 +61,15 @@ public partial class MainWindow : Window
         _settings = settings;
         InitializeComponent();
 
-        // Pre-assign ScaleTransforms for per-section bounce
-        AreaSection.RenderTransform = new ScaleTransform(1.0, 1.0);
-        FullSection.RenderTransform = new ScaleTransform(1.0, 1.0);
-        WinSection.RenderTransform  = new ScaleTransform(1.0, 1.0);
+        // Capsule-wide ScaleTransform for press animation (replaces per-section bounce)
+        RootCapsule.RenderTransform = new ScaleTransform(1.0, 1.0);
+        RootCapsule.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
+
+        // Capture references for press animation
+        _capsuleBg = RootCapsule.Background as SolidColorBrush;
+        _capsuleShadow = RootCapsule.Effect as DropShadowEffect;
+        _defaultBgColor = _capsuleBg?.Color ?? Color.FromArgb(0x1A, 0xFF, 0xFF, 0xFF);
+        _defaultShadowOpacity = _capsuleShadow?.Opacity ?? 0.25;
 
         DpiChanged += OnDpiChanged;
     }
@@ -146,11 +162,16 @@ public partial class MainWindow : Window
 
     private void ActivateSection(int index)
     {
+        // Press capsule, then release on next frame
+        AnimatePress();
+        _ = Dispatcher.BeginInvoke(() => AnimateRelease(),
+            System.Windows.Threading.DispatcherPriority.Normal);
+
         switch (index)
         {
-            case 0: BounceSection(AreaSection); ToggleAreaMode(); break;
-            case 1: BounceSection(FullSection); FlashFeedback(); CaptureRequested?.Invoke(); break;
-            case 2: BounceSection(WinSection); FlashFeedback(); CaptureModeRequested?.Invoke(CaptureMode.ActiveWindow); break;
+            case 0: ToggleAreaMode(); break;
+            case 1: FlashFeedback(); CaptureRequested?.Invoke(); break;
+            case 2: FlashFeedback(); CaptureModeRequested?.Invoke(CaptureMode.ActiveWindow); break;
         }
     }
 
@@ -235,6 +256,7 @@ public partial class MainWindow : Window
         {
             _mouseDownPos = e.GetPosition(this);
             _isDragging = false;
+            AnimatePress();
         }
         else if (e.MiddleButton == MouseButtonState.Pressed)
         {
@@ -263,6 +285,7 @@ public partial class MainWindow : Window
         if (_isDragging)
         {
             _isDragging = false;
+            RestoreCapsuleInstant();
             ApplyEdgeSnap();
             DragEnded?.Invoke();
             return;
@@ -277,13 +300,16 @@ public partial class MainWindow : Window
         }
         _lastClickTime = now;
 
+        // Release animation (smooth return from pressed state)
+        AnimateRelease();
+
         // Dispatch based on section
         var clickPos = e.GetPosition(this);
         switch (GetSectionIndex(clickPos.X))
         {
-            case 0: BounceSection(AreaSection); ToggleAreaMode(); break;
-            case 1: BounceSection(FullSection); FlashFeedback(); CaptureRequested?.Invoke(); break;
-            case 2: BounceSection(WinSection); FlashFeedback(); CaptureModeRequested?.Invoke(CaptureMode.ActiveWindow); break;
+            case 0: ToggleAreaMode(); break;
+            case 1: FlashFeedback(); CaptureRequested?.Invoke(); break;
+            case 2: FlashFeedback(); CaptureModeRequested?.Invoke(CaptureMode.ActiveWindow); break;
         }
     }
 
@@ -351,18 +377,85 @@ public partial class MainWindow : Window
 
     // ── Feedback ──────────────────────────────────────────────────────
 
-    private void BounceSection(FrameworkElement element)
+    /// <summary>
+    /// Press animation — scale capsule to 97%, darken background, soften shadow.
+    /// </summary>
+    private void AnimatePress()
     {
-        if (element.RenderTransform is not ScaleTransform scale)
-        { scale = new ScaleTransform(1.0, 1.0); element.RenderTransform = scale; }
+        var scale = (ScaleTransform)RootCapsule.RenderTransform;
+        var easeOut = new QuadraticEase { EasingMode = EasingMode.EaseOut };
 
-        var bounce = new DoubleAnimation
+        var scaleAnim = new DoubleAnimation(PressScale, PressDuration)
+            { EasingFunction = easeOut };
+        scale.BeginAnimation(ScaleTransform.ScaleXProperty, scaleAnim);
+        scale.BeginAnimation(ScaleTransform.ScaleYProperty, scaleAnim);
+
+        // Slightly darken the capsule background (#1A → #15)
+        if (_capsuleBg != null)
         {
-            From = 0.85, To = 1.0, Duration = TimeSpan.FromMilliseconds(400),
-            EasingFunction = new BackEase { Amplitude = 0.5, EasingMode = EasingMode.EaseOut },
-        };
-        scale.BeginAnimation(ScaleTransform.ScaleXProperty, bounce);
-        scale.BeginAnimation(ScaleTransform.ScaleYProperty, bounce);
+            var darker = Color.FromArgb(0x15, 0xFF, 0xFF, 0xFF);
+            var bgAnim = new ColorAnimation(darker, PressDuration)
+                { EasingFunction = easeOut };
+            _capsuleBg.BeginAnimation(SolidColorBrush.ColorProperty, bgAnim);
+        }
+
+        // Reduce shadow intensity
+        if (_capsuleShadow != null)
+        {
+            var shadowAnim = new DoubleAnimation(0.08, PressDuration)
+                { EasingFunction = easeOut };
+            _capsuleShadow.BeginAnimation(DropShadowEffect.OpacityProperty, shadowAnim);
+        }
+    }
+
+    /// <summary>
+    /// Release animation — scale back to 100%, restore background and shadow.
+    /// </summary>
+    private void AnimateRelease()
+    {
+        var scale = (ScaleTransform)RootCapsule.RenderTransform;
+        var easeOut = new QuadraticEase { EasingMode = EasingMode.EaseOut };
+
+        var scaleAnim = new DoubleAnimation(1.0, ReleaseDuration)
+            { EasingFunction = easeOut };
+        scale.BeginAnimation(ScaleTransform.ScaleXProperty, scaleAnim);
+        scale.BeginAnimation(ScaleTransform.ScaleYProperty, scaleAnim);
+
+        if (_capsuleBg != null)
+        {
+            var bgAnim = new ColorAnimation(_defaultBgColor, ReleaseDuration)
+                { EasingFunction = easeOut };
+            _capsuleBg.BeginAnimation(SolidColorBrush.ColorProperty, bgAnim);
+        }
+
+        if (_capsuleShadow != null)
+        {
+            var shadowAnim = new DoubleAnimation(_defaultShadowOpacity, ReleaseDuration)
+                { EasingFunction = easeOut };
+            _capsuleShadow.BeginAnimation(DropShadowEffect.OpacityProperty, shadowAnim);
+        }
+    }
+
+    /// <summary>Instantly restore capsule visuals (for drag-end).</summary>
+    private void RestoreCapsuleInstant()
+    {
+        var scale = (ScaleTransform)RootCapsule.RenderTransform;
+        scale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
+        scale.BeginAnimation(ScaleTransform.ScaleYProperty, null);
+        scale.ScaleX = 1.0;
+        scale.ScaleY = 1.0;
+
+        if (_capsuleBg != null)
+        {
+            _capsuleBg.BeginAnimation(SolidColorBrush.ColorProperty, null);
+            _capsuleBg.Color = _defaultBgColor;
+        }
+
+        if (_capsuleShadow != null)
+        {
+            _capsuleShadow.BeginAnimation(DropShadowEffect.OpacityProperty, null);
+            _capsuleShadow.Opacity = _defaultShadowOpacity;
+        }
     }
 
     private void FlashFeedback()
