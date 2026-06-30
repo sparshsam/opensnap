@@ -90,7 +90,8 @@ public static class ScreenshotService
     }
 
     /// <summary>Generates a timestamped filename using the configured template.</summary>
-    public static string GenerateFileName(string? template = null)
+    public static string GenerateFileName(string? template = null,
+        string? projectPrefix = null, int? sequentialNumber = null)
     {
         var fmt = template ?? "screenshot-{yyyy}-{MM}-{dd}-{HHmmss}";
         var now = DateTime.Now;
@@ -100,8 +101,29 @@ public static class ScreenshotService
                  .Replace("{HH}", now.ToString("HH"))
                  .Replace("{mm}", now.ToString("mm"))
                  .Replace("{ss}", now.ToString("ss"))
-                 .Replace("{HHmmss}", now.ToString("HHmmss"));
-        return fmt + ".png";
+                 .Replace("{HHmmss}", now.ToString("HHmmss"))
+                 .Replace("{seq}", (sequentialNumber ?? 0).ToString("D4"))
+                 .Replace("{prefix}", projectPrefix ?? "");
+
+        // Clean up double underscores/separators from empty prefix
+        var name = fmt;
+        if (string.IsNullOrEmpty(projectPrefix))
+            name = name.Replace("{prefix}-", "").Replace("{prefix}_", "").Replace("{prefix}", "");
+        name = name.Trim('-', '_', ' ');
+        return name + ".png";
+    }
+
+    /// <summary>Resolve the full save path including optional date subfolders.</summary>
+    public static string ResolveSavePath(string basePath, AppSettings settings)
+    {
+        if (!settings.DateSubfolders)
+            return basePath;
+
+        var now = DateTime.Now;
+        var sub = Path.Combine(
+            now.ToString("yyyy"),
+            now.ToString("MM-yyyy"));
+        return Path.Combine(basePath, sub);
     }
 
     /// <summary>Opens the folder in File Explorer.</summary>

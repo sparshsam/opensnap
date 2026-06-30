@@ -25,6 +25,10 @@ public sealed class TrayService : IDisposable
     public event Action? CopyFilePathRequested;
     public event Action? RevealInExplorerRequested;
     public event Action<int>? OpenHistoryItemRequested;
+    public event Action<int>? PinHistoryItemRequested;
+    public event Action<int>? DeleteHistoryItemRequested;
+    public event Action? ClearHistoryRequested;
+    public event Action<string>? SearchHistoryRequested;
     public event Action? QuitRequested;
 
     public TrayService()
@@ -93,10 +97,29 @@ public sealed class TrayService : IDisposable
     }
 
     /// <summary>Update the recent-screenshots submenu with the latest entries.</summary>
-    public void UpdateHistory(List<string> history, int maxDisplay = 5)
+    public void UpdateHistory(List<string> history, List<string>? pinned = null, int maxDisplay = 5)
     {
         _historyItem.DropDownItems.Clear();
 
+        // Pinned section
+        if (pinned is { Count: > 0 })
+        {
+            foreach (var pinPath in pinned)
+            {
+                if (!File.Exists(pinPath)) continue;
+                var pinName = Path.GetFileName(pinPath);
+                var pinItem = new Forms.ToolStripMenuItem($"📌 {pinName}");
+                pinItem.Click += (_, _) =>
+                {
+                    try { System.Diagnostics.Process.Start("explorer.exe", $"\"{pinPath}\""); }
+                    catch { }
+                };
+                _historyItem.DropDownItems.Add(pinItem);
+            }
+            _historyItem.DropDownItems.Add(new Forms.ToolStripSeparator());
+        }
+
+        // Recent captures
         if (history.Count == 0)
         {
             _historyItem.DropDownItems.Add(new Forms.ToolStripMenuItem("(none)") { Enabled = false });
@@ -106,12 +129,29 @@ public sealed class TrayService : IDisposable
         int start = Math.Max(0, history.Count - maxDisplay);
         for (int i = start; i < history.Count; i++)
         {
-            var fileName = Path.GetFileName(history[i]);
-            var index = i; // capture for closure
+            var path = history[i];
+            var fileName = Path.GetFileName(path);
+            var index = i;
             var item = new Forms.ToolStripMenuItem(fileName);
             item.Click += (_, _) => OpenHistoryItemRequested?.Invoke(index);
+
+            // Pin action
+            var pinSub = new Forms.ToolStripMenuItem("Pin to top");
+            pinSub.Click += (_, _) => PinHistoryItemRequested?.Invoke(index);
+            item.DropDownItems.Add(pinSub);
+
+            // Delete action
+            var delSub = new Forms.ToolStripMenuItem("Delete from history");
+            delSub.Click += (_, _) => DeleteHistoryItemRequested?.Invoke(index);
+            item.DropDownItems.Add(delSub);
+
             _historyItem.DropDownItems.Add(item);
         }
+
+        _historyItem.DropDownItems.Add(new Forms.ToolStripSeparator());
+        var clearItem = new Forms.ToolStripMenuItem("Clear history");
+        clearItem.Click += (_, _) => ClearHistoryRequested?.Invoke();
+        _historyItem.DropDownItems.Add(clearItem);
     }
 
     public void SetHistoryActionsEnabled(bool hasHistory)

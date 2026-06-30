@@ -47,6 +47,21 @@ public sealed class AppSettings
     // v0.7.0 — auto-hide when fullscreen app is active
     public bool AutoHideFullscreen { get; set; } = false;
 
+    // v0.8.0 — naming
+    public string ProjectPrefix { get; set; } = "";
+    public bool UseSequentialNumbering { get; set; } = false;
+    public int SequentialCounter { get; set; } = 1;
+    public bool DateSubfolders { get; set; } = false;
+
+    // v0.8.0 — custom open-with app
+    public string CustomAppPath { get; set; } = "";
+
+    // v0.8.0 — pinned captures (paths)
+    public List<string> PinnedCaptures { get; set; } = new();
+
+    // v0.8.0 — show quick-actions popup after capture
+    public bool ShowQuickActions { get; set; } = true;
+
     // ── Serialisation ─────────────────────────────────────────────────
 
     public static AppSettings Load()

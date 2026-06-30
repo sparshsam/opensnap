@@ -46,6 +46,9 @@ public partial class App : System.Windows.Application
         _tray.CopyFilePathRequested += OnCopyFilePath;
         _tray.RevealInExplorerRequested += OnRevealInExplorer;
         _tray.OpenHistoryItemRequested += OnOpenHistoryItem;
+        _tray.PinHistoryItemRequested += OnPinHistoryItem;
+        _tray.DeleteHistoryItemRequested += OnDeleteHistoryItem;
+        _tray.ClearHistoryRequested += OnClearHistory;
         _tray.QuitRequested += OnQuit;
         _tray.SetStartupChecked(_settings.LaunchAtStartup);
         _tray.UpdateHistory(_settings.ScreenshotHistory);
@@ -135,22 +138,24 @@ public partial class App : System.Windows.Application
 
             if (source == null) return;
 
-            var folder = AppSettings.EnsureFolder(_settings!.SavePath);
-            var fileName = ScreenshotService.GenerateFileName(_settings.FilenameTemplate);
-            var fullPath = Path.Combine(folder, fileName);
+            // Advanced naming: resolve path + filename
+            var baseFolder = AppSettings.EnsureFolder(_settings!.SavePath);
+            var saveFolder = ScreenshotService.ResolveSavePath(baseFolder, _settings);
+            Directory.CreateDirectory(saveFolder);
+
+            int seq = _settings.UseSequentialNumbering ? _settings.SequentialCounter++ : 0;
+            var fileName = ScreenshotService.GenerateFileName(
+                _settings.FilenameTemplate, _settings.ProjectPrefix, seq);
+            var fullPath = Path.Combine(saveFolder, fileName);
 
             ScreenshotService.SaveAsPng(source, fullPath);
             ScreenshotService.CopyToClipboard(source);
 
-            // OCR mode: extract text and copy to clipboard too
-            string ocrSuffix = "";
+            // OCR mode: extract text
+            string ocrText = "";
             if (mode == CaptureMode.CaptureOcr)
             {
-                var (ocrText, ocrCopied) = await OcrService.CaptureOcrAsync(source);
-                if (!string.IsNullOrWhiteSpace(ocrText))
-                {
-                    ocrSuffix = ocrCopied ? "  + OCR copied" : "  + OCR done";
-                }
+                (ocrText, _) = await OcrService.CaptureOcrAsync(source);
             }
 
             // Play capture sound
@@ -163,9 +168,19 @@ public partial class App : System.Windows.Application
                 _settings.ScreenshotHistory.RemoveAt(0);
             _settings.Save();
 
-            _tray?.UpdateHistory(_settings.ScreenshotHistory);
+            _tray?.UpdateHistory(_settings.ScreenshotHistory, _settings.PinnedCaptures);
             _tray?.SetHistoryActionsEnabled(true);
-            _tray?.Notify("OpenSnap", $"Saved  \u2022  {fileName}{ocrSuffix}");
+
+            // Show quick-actions popup
+            if (_settings.ShowQuickActions)
+            {
+                var popup = new CapturePopup(fullPath, ocrText, _settings);
+                popup.Show();
+            }
+            else
+            {
+                _tray?.Notify("OpenSnap", $"Saved  \u2022  {fileName}");
+            }
         }
         catch (Exception ex)
         {
@@ -343,6 +358,36 @@ public partial class App : System.Windows.Application
         var path = _settings.ScreenshotHistory[index];
         if (File.Exists(path))
             System.Diagnostics.Process.Start("explorer.exe", $"\"{path}\"");
+    }
+
+    private void OnPinHistoryItem(int index)
+    {
+        if (_settings == null || index < 0 || index >= _settings.ScreenshotHistory.Count) return;
+        var path = _settings.ScreenshotHistory[index];
+        if (!_settings.PinnedCaptures.Contains(path))
+        {
+            _settings.PinnedCaptures.Add(path);
+            _settings.Save();
+            _tray?.UpdateHistory(_settings.ScreenshotHistory, _settings.PinnedCaptures);
+        }
+    }
+
+    private void OnDeleteHistoryItem(int index)
+    {
+        if (_settings == null || index < 0 || index >= _settings.ScreenshotHistory.Count) return;
+        _settings.ScreenshotHistory.RemoveAt(index);
+        _settings.Save();
+        _tray?.UpdateHistory(_settings.ScreenshotHistory, _settings.PinnedCaptures);
+        _tray?.SetHistoryActionsEnabled(_settings.ScreenshotHistory.Count > 0);
+    }
+
+    private void OnClearHistory()
+    {
+        if (_settings == null) return;
+        _settings.ScreenshotHistory.Clear();
+        _settings.Save();
+        _tray?.UpdateHistory(_settings.ScreenshotHistory, _settings.PinnedCaptures);
+        _tray?.SetHistoryActionsEnabled(false);
     }
 
     // ── Settings window ───────────────────────────────────────────────

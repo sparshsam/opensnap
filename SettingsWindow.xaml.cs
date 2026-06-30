@@ -71,6 +71,13 @@ public partial class SettingsWindow : Window
         // Filename template
         TemplateBox.Text = _settings.FilenameTemplate;
 
+        // Naming
+        PrefixBox.Text = _settings.ProjectPrefix;
+        SeqNumberCheck.IsChecked = _settings.UseSequentialNumbering;
+        DateFoldersCheck.IsChecked = _settings.DateSubfolders;
+        CustomAppBox.Text = _settings.CustomAppPath;
+        QuickActionsCheck.IsChecked = _settings.ShowQuickActions;
+
         // Full screen hotkey
         SelectModCombo(FullScreenModCombo, _settings.HotkeyCaptureModifiers);
         SelectKeyCombo(FullScreenKeyCombo, _settings.HotkeyCaptureKey);
@@ -147,10 +154,34 @@ public partial class SettingsWindow : Window
         _settings.PlayCaptureSound = PlaySoundCheck.IsChecked ?? true;
         _settings.EdgeSnapEnabled = EdgeSnapCheck.IsChecked ?? true;
         _settings.AutoHideFullscreen = AutoHideCheck.IsChecked ?? false;
+        _settings.UseSequentialNumbering = SeqNumberCheck.IsChecked ?? false;
+        _settings.DateSubfolders = DateFoldersCheck.IsChecked ?? false;
+        _settings.ShowQuickActions = QuickActionsCheck.IsChecked ?? true;
         _settings.Save();
 
         StartupManager.SetStartup(_settings.LaunchAtStartup);
         VisualSettingsChanged?.Invoke();
+    }
+    private void OnNamingChanged(object sender, EventArgs e)
+    {
+        if (_suppressToggle) return;
+        _settings.ProjectPrefix = PrefixBox.Text;
+        _settings.CustomAppPath = CustomAppBox.Text;
+        _settings.Save();
+    }
+    private void OnBrowseApp(object sender, RoutedEventArgs e)
+    {
+        using var dialog = new Forms.OpenFileDialog
+        {
+            Title = "Select image editor",
+            Filter = "Executables (*.exe)|*.exe|All files (*.*)|*.*",
+        };
+        if (dialog.ShowDialog() == Forms.DialogResult.OK)
+        {
+            CustomAppBox.Text = dialog.FileName;
+            _settings.CustomAppPath = dialog.FileName;
+            _settings.Save();
+        }
     }
 
     private void OnHotkeyChanged(object sender, SelectionChangedEventArgs e)
