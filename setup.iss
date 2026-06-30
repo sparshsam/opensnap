@@ -1,8 +1,13 @@
 ; OpenSnap — Inno Setup installer script
 ; Build: ISCC.exe setup.iss
+; Usage:
+;   ISCC.exe setup.iss                       # normal
+;   ISCC.exe setup.iss /DALLUSERS            # per-machine install (admin)
+;   installer.exe /VERYSILENT /ALLUSERS      # silent per-machine
+;   installer.exe /VERYSILENT /CURRENTUSER   # silent per-user
 
 #define MyAppName "OpenSnap"
-#define MyAppVersion "0.7.0"
+#define MyAppVersion "0.9.0"
 #define MyAppPublisher "Sparsh"
 #define MyAppURL "https://github.com/sparshsam/opensnap"
 #define MyAppExeName "OpenSnap.exe"
@@ -15,9 +20,9 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={localappdata}\Programs\{#MyAppName}
+DefaultDirName={autopf}\{#MyAppName}
+DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-DisableDirPage=yes
 OutputDir=dist
 OutputBaseFilename=OpenSnap-Setup-v{#MyAppVersion}
 SetupIconFile=Resources\app.ico
@@ -25,15 +30,27 @@ UninstallDisplayIcon={app}\OpenSnap.exe
 UninstallDisplayName={#MyAppName} {#MyAppVersion}
 Compression=lzma2
 SolidCompression=yes
-PrivilegesRequired=lowest
 CloseApplications=force
 DisableWelcomePage=no
 DisableFinishedPage=no
 ShowLanguageDialog=no
 AppCopyright=© {#MyAppPublisher}
+AppContact={#MyAppURL}
+VersionInfoVersion={#MyAppVersion}
+VersionInfoCompany={#MyAppPublisher}
+VersionInfoDescription={#MyAppName} Screenshot Widget
+MinVersion=10.0.17763.0
 
-; Branding — place 164×314 WizardSmallImageFile and 55×58 WizardImageFile
-; in Resources/ to replace the default Inno Setup graphics.
+; Install mode: per-user (default, no admin) or per-machine (/ALLUSERS)
+PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=commandline dialog
+
+; Silent install support:
+;   installer.exe /VERYSILENT /SUPPRESSMSGBOXES /CURRENTUSER
+;   installer.exe /VERYSILENT /SUPPRESSMSGBOXES /ALLUSERS
+
+; Branding — place 164×314 (WizardSmallImageFile) and 55×58 (WizardImageFile)
+; BMPs in Resources/ to replace the default Inno Setup graphics.
 ; WizardSmallImageFile=Resources\wizard-small.bmp
 ; WizardImageFile=Resources\wizard-large.bmp
 
@@ -41,7 +58,7 @@ AppCopyright=© {#MyAppPublisher}
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional shortcuts:"
+Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional shortcuts:"; Flags: checkedonce
 
 [Files]
 Source: "release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -52,7 +69,7 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "Launch {#MyAppName}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "Launch {#MyAppName}"; Flags: nowait postinstall skipifsilent unchecked
 
 [UninstallRun]
 Filename: "{cmd}"; Parameters: "/c taskkill /f /im OpenSnap.exe 2>nul"; Flags: runhidden

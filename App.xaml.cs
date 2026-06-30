@@ -49,6 +49,8 @@ public partial class App : System.Windows.Application
         _tray.PinHistoryItemRequested += OnPinHistoryItem;
         _tray.DeleteHistoryItemRequested += OnDeleteHistoryItem;
         _tray.ClearHistoryRequested += OnClearHistory;
+        _tray.CheckUpdateRequested += OnCheckUpdate;
+        _tray.UpdateNotificationClicked += OnUpdateNotificationClicked;
         _tray.QuitRequested += OnQuit;
         _tray.SetStartupChecked(_settings.LaunchAtStartup);
         _tray.UpdateHistory(_settings.ScreenshotHistory);
@@ -388,6 +390,18 @@ public partial class App : System.Windows.Application
         _settings.Save();
         _tray?.UpdateHistory(_settings.ScreenshotHistory, _settings.PinnedCaptures);
         _tray?.SetHistoryActionsEnabled(false);
+    }
+
+    private async void OnCheckUpdate()
+    {
+        if (_updater != null)
+            await _updater.CheckAsync(silentIfUpToDate: false);
+    }
+
+    private async void OnUpdateNotificationClicked()
+    {
+        if (_updater != null)
+            await _updater.DownloadAndInstallAsync();
     }
 
     // ── Settings window ───────────────────────────────────────────────

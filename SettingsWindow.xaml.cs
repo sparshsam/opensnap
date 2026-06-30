@@ -227,7 +227,7 @@ public partial class SettingsWindow : Window
 
     private void OnAbout(object sender, RoutedEventArgs e)
     {
-        var dialog = new AboutDialog
+        var dialog = new AboutDialog(_settings)
         {
             Owner = this,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,

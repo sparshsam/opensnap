@@ -29,6 +29,7 @@ public sealed class TrayService : IDisposable
     public event Action<int>? DeleteHistoryItemRequested;
     public event Action? ClearHistoryRequested;
     public event Action<string>? SearchHistoryRequested;
+    public event Action? CheckUpdateRequested;
     public event Action? QuitRequested;
 
     public TrayService()
@@ -67,6 +68,9 @@ public sealed class TrayService : IDisposable
             StartupToggleRequested?.Invoke(_startupItem.Checked);
         };
 
+        var updateItem = new Forms.ToolStripMenuItem("Check for updates");
+        updateItem.Click += (_, _) => CheckUpdateRequested?.Invoke();
+
         var quitItem = new Forms.ToolStripMenuItem("Quit");
         quitItem.Click += (_, _) => QuitRequested?.Invoke();
 
@@ -83,6 +87,7 @@ public sealed class TrayService : IDisposable
             _historyItem,
             new Forms.ToolStripSeparator(),
             _startupItem,
+            updateItem,
             new Forms.ToolStripSeparator(),
             quitItem,
         });
@@ -170,15 +175,38 @@ public sealed class TrayService : IDisposable
         _icon.ShowBalloonTip(3000, title, text, Forms.ToolTipIcon.Info);
     }
 
-    /// <summary>Show a balloon tip that opens a URL when clicked.</summary>
+    /// <summary>Fired when the user clicks an update notification.</summary>
+    public event Action? UpdateNotificationClicked;
+
+    /// <summary>Show a balloon tip that opens a URL or triggers an action when clicked.</summary>
     public void NotifyWithLink(string title, string text, string url)
     {
-        // Wire a one-shot click handler that opens the URL
         EventHandler handler = null!;
         handler = (_, _) =>
         {
             _icon.BalloonTipClicked -= handler;
-            try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true }); }
+            try
+            {
+                if (url == "checkupdate://")
+                {
+                    UpdateNotificationClicked?.Invoke();
+                }
+                else if (url.StartsWith("install://"))
+                {
+                    var path = url["install://".Length..];
+                    if (File.Exists(path))
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = path,
+                            Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /CURRENTUSER",
+                            UseShellExecute = true,
+                        });
+                }
+                else
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
+                }
+            }
             catch { /* best-effort */ }
         };
         _icon.BalloonTipClicked += handler;
