@@ -15,7 +15,9 @@
         PreviewMouseLeftButtonDown="OnPreviewMouseDown"
         PreviewMouseMove="OnPreviewMouseMove"
         PreviewMouseLeftButtonUp="OnPreviewMouseUp"
-        PreviewMouseRightButtonUp="OnPreviewRightClick">
+        PreviewMouseRightButtonUp="OnPreviewRightClick"
+        PreviewKeyDown="OnPreviewKeyDown"
+        Focusable="True">
 
     <Window.Resources>
         <DropShadowEffect x:Key="PillShadow"
@@ -86,9 +88,11 @@
                         CornerRadius="18,0,0,18"
                         Background="Transparent"
                         RenderTransformOrigin="0.5,0.5"
+                        Focusable="True"
                         MouseEnter="OnAreaMouseEnter"
                         MouseLeave="OnAreaMouseLeave"
-                        ToolTip="Area selection">
+                        ToolTip="Area selection"
+                        AutomationProperties.Name="Area selection">
                     <Viewbox Width="18"
                              Height="18"
                              Stretch="Uniform"
@@ -115,9 +119,11 @@
                         Grid.Column="1"
                         Background="Transparent"
                         RenderTransformOrigin="0.5,0.5"
+                        Focusable="True"
                         MouseEnter="OnFullMouseEnter"
                         MouseLeave="OnFullMouseLeave"
-                        ToolTip="Full screen capture">
+                        ToolTip="Full screen capture"
+                        AutomationProperties.Name="Full screen capture">
                     <Viewbox Width="18"
                              Height="18"
                              Stretch="Uniform"
@@ -145,9 +151,11 @@
                         CornerRadius="0,18,18,0"
                         Background="Transparent"
                         RenderTransformOrigin="0.5,0.5"
+                        Focusable="True"
                         MouseEnter="OnWinMouseEnter"
                         MouseLeave="OnWinMouseLeave"
-                        ToolTip="Active window capture">
+                        ToolTip="Active window capture"
+                        AutomationProperties.Name="Active window capture">
                     <Viewbox Width="18"
                              Height="18"
                              Stretch="Uniform"

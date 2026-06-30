@@ -8,6 +8,9 @@ namespace OpenSnap;
 
 public partial class App : System.Windows.Application
 {
+    /// <summary>Singleton localization service, accessible from all windows.</summary>
+    public static LocalizationService T { get; private set; } = new("en");
+
     private TrayService? _tray;
     private AppSettings? _settings;
     private MainWindow? _widget;
@@ -29,6 +32,10 @@ public partial class App : System.Windows.Application
         Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
         _settings = AppSettings.Load();
+
+        // Initialize localization from saved preference
+        T = LocalizationService.FromCode(_settings.Language);
+        T.LanguageChanged += OnLanguageChanged;
 
         if (_settings.LaunchAtStartup != StartupManager.IsRegisteredForStartup())
             StartupManager.SetStartup(_settings.LaunchAtStartup);
@@ -285,6 +292,14 @@ public partial class App : System.Windows.Application
     }
 
     // ── Exception logging ───────────────────────────────────────────────
+
+    private void OnLanguageChanged()
+    {
+        _settings!.Language = T.CurrentCode;
+        _settings.Save();
+        // Refresh UI strings on main windows
+        _widget?.ApplyLanguage();
+    }
 
     private static void LogException(string context, Exception ex)
     {

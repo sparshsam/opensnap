@@ -39,6 +39,21 @@ public partial class SettingsWindow : Window
         _settings = settings;
         InitializeComponent();
         PopulateKeyCombos();
+        PopulateLanguageCombo();
+    }
+
+    private void PopulateLanguageCombo()
+    {
+        foreach (var (code, name) in LocalizationService.Languages)
+        {
+            LangCombo.Items.Add(new ComboBoxItem { Content = name, Tag = code });
+        }
+        // Select current language
+        for (int i = 0; i < LangCombo.Items.Count; i++)
+        {
+            if (LangCombo.Items[i] is ComboBoxItem item && item.Tag is string tag && tag == _settings.Language)
+            { LangCombo.SelectedIndex = i; break; }
+        }
     }
 
     public event Action? VisualSettingsChanged;
@@ -75,6 +90,7 @@ public partial class SettingsWindow : Window
         PrefixBox.Text = _settings.ProjectPrefix;
         SeqNumberCheck.IsChecked = _settings.UseSequentialNumbering;
         DateFoldersCheck.IsChecked = _settings.DateSubfolders;
+        LargeIconsCheck.IsChecked = _settings.LargeIcons;
         CustomAppBox.Text = _settings.CustomAppPath;
         QuickActionsCheck.IsChecked = _settings.ShowQuickActions;
 
@@ -154,6 +170,7 @@ public partial class SettingsWindow : Window
         _settings.PlayCaptureSound = PlaySoundCheck.IsChecked ?? true;
         _settings.EdgeSnapEnabled = EdgeSnapCheck.IsChecked ?? true;
         _settings.AutoHideFullscreen = AutoHideCheck.IsChecked ?? false;
+        _settings.LargeIcons = LargeIconsCheck.IsChecked ?? false;
         _settings.UseSequentialNumbering = SeqNumberCheck.IsChecked ?? false;
         _settings.DateSubfolders = DateFoldersCheck.IsChecked ?? false;
         _settings.ShowQuickActions = QuickActionsCheck.IsChecked ?? true;
@@ -218,6 +235,15 @@ public partial class SettingsWindow : Window
         OpacityLabel.Text = $"{(int)(_settings.Opacity * 100)}%";
         _settings.Save();
         VisualSettingsChanged?.Invoke();
+    }
+
+    private void OnLangChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_suppressToggle) return;
+        if (LangCombo.SelectedItem is ComboBoxItem item && item.Tag is string code)
+        {
+            App.T.SetLanguage(code);
+        }
     }
 
     private void OnClose(object sender, RoutedEventArgs e)

@@ -30,6 +30,8 @@
     <Resource Include="Resources\app.ico" />
     <None Remove="Resources\capture.wav" />
     <Resource Include="Resources\capture.wav" />
+    <None Remove="Resources\Lang\*.json" />
+    <Content Include="Resources\Lang\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

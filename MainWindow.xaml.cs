@@ -89,6 +89,80 @@ public partial class MainWindow : Window
         ClampToVisibleScreen();
     }
 
+    /// <summary>Refresh UI strings when language changes.</summary>
+    public void ApplyLanguage()
+    {
+        var t = App.T;
+        AreaSection.ToolTip = t.GetString("pill.tooltip.area");
+        FullSection.ToolTip = t.GetString("pill.tooltip.full");
+        WinSection.ToolTip = t.GetString("pill.tooltip.win");
+
+        // Context menu
+        foreach (MenuItem item in CaptureMenu.Items)
+        {
+            item.Header = item.Tag switch
+            {
+                "FullScreen"    => t.GetString("menu.fullscreen"),
+                "ActiveWindow"  => t.GetString("menu.activewindow"),
+                "AreaSelection" => t.GetString("menu.areaselection"),
+                "CaptureOcr"    => t.GetString("menu.captureocr"),
+                "Settings"      => t.GetString("menu.settings"),
+                "Exit"          => t.GetString("menu.exit"),
+                _               => item.Header,
+            };
+        }
+    }
+
+    // ── Keyboard navigation ───────────────────────────────────────────
+
+    private int _focusedSection;
+    private readonly Border[] _sections = new Border[3];
+
+    private void OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        // Initialize section references on first key press
+        if (_sections[0] is null)
+        { _sections[0] = AreaSection; _sections[1] = FullSection; _sections[2] = WinSection; }
+
+        switch (e.Key)
+        {
+            case Key.Left:
+                _focusedSection = (_focusedSection - 1 + 3) % 3;
+                _sections[_focusedSection].Focus();
+                e.Handled = true;
+                break;
+            case Key.Right:
+                _focusedSection = (_focusedSection + 1) % 3;
+                _sections[_focusedSection].Focus();
+                e.Handled = true;
+                break;
+            case Key.Enter:
+            case Key.Space:
+                ActivateSection(_focusedSection);
+                e.Handled = true;
+                break;
+        }
+    }
+
+    private void ActivateSection(int index)
+    {
+        switch (index)
+        {
+            case 0: BounceSection(AreaSection); ToggleAreaMode(); break;
+            case 1: BounceSection(FullSection); FlashFeedback(); CaptureRequested?.Invoke(); break;
+            case 2: BounceSection(WinSection); FlashFeedback(); CaptureModeRequested?.Invoke(CaptureMode.ActiveWindow); break;
+        }
+    }
+
+    // ── High Contrast support ─────────────────────────────────────────
+
+    private void ApplyHighContrastIfNeeded()
+    {
+        if (!SystemParameters.HighContrast) return;
+        RootCapsule.Background = System.Windows.SystemColors.WindowBrush;
+        RootCapsule.BorderBrush = System.Windows.SystemColors.WindowTextBrush;
+    }
+
     // ── Right-click context menu ──────────────────────────────────────
 
     private void OnPreviewRightClick(object sender, MouseButtonEventArgs e)

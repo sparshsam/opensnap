@@ -141,6 +141,7 @@
             <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,4,0,0">
                 <CheckBox x:Name="SeqNumberCheck" Content="Sequential numbering" Margin="0,0,0,4" Checked="OnToggleChanged" Unchecked="OnToggleChanged" />
                 <CheckBox x:Name="DateFoldersCheck" Content="Date-based subfolders (yyyy/MM-yyyy)" Margin="0,0,0,4" Checked="OnToggleChanged" Unchecked="OnToggleChanged" />
+                <CheckBox x:Name="LargeIconsCheck" Content="Larger icons" Margin="0,0,0,4" Checked="OnToggleChanged" Unchecked="OnToggleChanged" />
             </StackPanel>
 
             <Label Grid.Row="2" Grid.Column="0" Content="Open with app:" Padding="0,8,8,4" VerticalAlignment="Center" />
@@ -152,6 +153,9 @@
                 <TextBox x:Name="CustomAppBox" Grid.Column="0" Padding="4" BorderBrush="#AAA" TextChanged="OnNamingChanged" />
                 <Button Grid.Column="1" Content="Browse…" Width="70" Margin="6,0,0,0" Padding="4,2" Click="OnBrowseApp" />
             </Grid>
+
+            <Label Grid.Row="3" Grid.Column="0" Content="Language:" Padding="0,8,8,4" VerticalAlignment="Center" />
+            <ComboBox x:Name="LangCombo" Grid.Row="3" Grid.Column="1" Margin="0,6,0,0" Padding="4,2" SelectionChanged="OnLangChanged" />
         </Grid>
 
         <!-- Close + About -->
