@@ -1,6 +1,7 @@
-<p align="center">
-  <img src="assets/branding/app.ico" width="64" height="64" alt="OpenSnap">
-</p>
+<picture align="center">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/branding/logo-white.svg">
+  <img src="assets/branding/logo-on-black.png" width="64" alt="OpenSnap">
+</picture>
 
 <h1 align="center">OpenSnap</h1>
 
