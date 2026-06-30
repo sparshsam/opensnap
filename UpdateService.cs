@@ -76,7 +76,7 @@ public sealed class UpdateService
 
     private Task Notify(string message, bool isUpdate = false)
     {
-        return Application.Current.Dispatcher.InvokeAsync(() =>
+        return System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
         {
             if (isUpdate && _latestHtmlUrl is not null)
                 _tray.NotifyWithLink("OpenSnap — Update", message, _latestHtmlUrl);

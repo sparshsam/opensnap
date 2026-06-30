@@ -62,7 +62,7 @@ public partial class MainWindow : Window
         DpiChanged += OnDpiChanged;
     }
 
-    private void OnDpiChanged(object? sender, DpiChangedEventArgs e)
+    private void OnDpiChanged(object? sender, System.Windows.DpiChangedEventArgs e)
     {
         ClampToVisibleScreen();
     }

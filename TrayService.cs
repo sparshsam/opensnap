@@ -133,7 +133,7 @@ public sealed class TrayService : IDisposable
     public void NotifyWithLink(string title, string text, string url)
     {
         // Wire a one-shot click handler that opens the URL
-        BalloonTipClicked handler = null!;
+        EventHandler handler = null!;
         handler = (_, _) =>
         {
             _icon.BalloonTipClicked -= handler;
@@ -143,8 +143,6 @@ public sealed class TrayService : IDisposable
         _icon.BalloonTipClicked += handler;
         _icon.ShowBalloonTip(3000, title, text, Forms.ToolTipIcon.Info);
     }
-
-    private delegate void BalloonTipClicked(object? sender, EventArgs e);
 
     private static System.Drawing.Icon LoadTrayIcon()
     {

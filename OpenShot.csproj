@@ -17,6 +17,9 @@
     <Authors>Sparsh</Authors>
     <Product>OpenSnap</Product>
 
+    <!-- DPI awareness — WPF PerMonitorV2 for per-monitor scaling -->
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+
     <!-- MSIX packaging support (requires Windows SDK) -->
     <WindowsPackageType>None</WindowsPackageType>
     <AppxPackage>false</AppxPackage>

@@ -71,19 +71,22 @@ and a GitHub link. Exit option in the context menu.
 
 ## Roadmap
 
-### v0.7 — Quality (current)
-- [x] Fix bugs found by users
-- [ ] Improve DPI scaling
-- [ ] Multi-monitor edge cases
-- [ ] Performance profiling
-- [ ] Accessibility review
-- [ ] Release installer + tag v0.7.0
+### v0.7 — Triple-button pill ✓
+- [x] 240px pill with 3 clickable sections + bounce animation + green flash
+- [x] Fix bugs found during test-app iteration
+- [x] DPI awareness (PerMonitorV2 via ApplicationHighDpiMode)
+- [x] Multi-monitor area selection fix (VirtualScreenLeft/Top + screen coords)
+- [x] Auto-update check from GitHub Releases (silent tray notification)
+- [x] MSIX packaging config (Package.appxmanifest + package-msix.ps1)
+- [x] Installer built + tagged v0.7.0 on GitHub
+  → **Remaining:** Perf profiling, accessibility review (needs Windows runtime)
 
-### v0.8 — Enterprise polish
-- [ ] Signed executable (code-signing certificate)
-- [ ] MSIX as additional distribution option (keep Inno Setup too)
-- [ ] Automatic update checking from GitHub Releases
-- [ ] Better installer branding
+### v0.8 — Store submission
+- [ ] Submit MSIX to Microsoft Partner Center for Store listing
+  *(No code-signing cert needed — Microsoft signs Store apps)*
+- [ ] Inno Setup installer as sideload fallback (keep on GitHub Releases)
+- [ ] First-run onboarding / tooltip
+- [ ] Store listing screenshots + description
 
 ### Future / stretch
 - Region/capture presets
