@@ -24,7 +24,7 @@
 <br>
 
 <p align="center">
-  <img src="assets/hero/hero.svg" width="720" alt="OpenSnap hero screenshot" style="border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.15);">
+  <img src="assets/screenshots/openshot-1.0.0.png" width="720" alt="OpenSnap screenshot" style="border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.15);">
 </p>
 
 <br>
