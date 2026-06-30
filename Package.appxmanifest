@@ -6,8 +6,8 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity Name="OpenSnap"
-            Publisher="CN=YourName"
-            Version="0.7.0.0" />
+            Publisher="CN=E6186421-BF8A-47E0-A89C-0F513DFF91C0"
+            Version="0.9.0.0" />
 
   <Properties>
     <DisplayName>OpenSnap</DisplayName>
