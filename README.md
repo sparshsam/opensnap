@@ -116,14 +116,16 @@ Translucent glass, minimal footprint (240 × 36 px), always-on-top, and zero chr
 ## Version Journey
 
 ```
-v0.1  ·  Initial glass capsule, basic capture      Nov 2024
-v0.5  ·  OCR, rename to OpenSnap                     Jan 2025
-v0.6  ·  Installer, About dialog, settings fixes     Mar 2025
-v0.7  ·  Triple-button pill, bounce, green flash     Jun 2026
-v0.8  ·  Quick actions, naming, history pinning      Jun 2026
-v0.9  ·  Languages, accessibility, auto-update       Jun 2026
-v1.0  ·  Stable release — polished, documented       Jun 2026
+v0.1  ·  Initial glass capsule, basic capture        28 Jun
+v0.5  ·  OCR, rename to OpenSnap                     28 Jun
+v0.6  ·  Installer, About dialog, settings fixes     29 Jun
+v0.7  ·  Triple-button pill, bounce, green flash     29 Jun
+v0.8  ·  Quick actions, naming, history pinning      29 Jun
+v0.9  ·  Languages, accessibility, auto-update       29 Jun
+v1.0  ·  Stable release — polished, documented       30 Jun
 ```
+
+<sub>Built across three days — no fluff, just shipped.</sub>
 
 Full changelog → [CHANGELOG.md](CHANGELOG.md)
 
