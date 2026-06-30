@@ -116,16 +116,14 @@ Translucent glass, minimal footprint (240 × 36 px), always-on-top, and zero chr
 ## Version Journey
 
 ```
-v0.1  ·  Initial glass capsule, basic capture        28 Jun
-v0.5  ·  OCR, rename to OpenSnap                     28 Jun
-v0.6  ·  Installer, About dialog, settings fixes     29 Jun
-v0.7  ·  Triple-button pill, bounce, green flash     29 Jun
-v0.8  ·  Quick actions, naming, history pinning      29 Jun
-v0.9  ·  Languages, accessibility, auto-update       29 Jun
-v1.0  ·  Stable release — polished, documented       30 Jun
+v0.1  ·  Initial glass capsule, basic capture        28 Jun 2026
+v0.5  ·  OCR, rename to OpenSnap                     28 Jun 2026
+v0.6  ·  Installer, About dialog, settings fixes     29 Jun 2026
+v0.7  ·  Triple-button pill, bounce, green flash     29 Jun 2026
+v0.8  ·  Quick actions, naming, history pinning      29 Jun 2026
+v0.9  ·  Languages, accessibility, auto-update       29 Jun 2026
+v1.0  ·  Stable release — polished, documented       30 Jun 2026
 ```
-
-<sub>Built across three days — no fluff, just shipped.</sub>
 
 Full changelog → [CHANGELOG.md](CHANGELOG.md)
 
@@ -133,7 +131,7 @@ Full changelog → [CHANGELOG.md](CHANGELOG.md)
 
 ## License
 
-[MIT](LICENSE) © Sparsh
+[MIT](LICENSE) © Kovina
 
 <br>
 
@@ -142,14 +140,31 @@ Full changelog → [CHANGELOG.md](CHANGELOG.md)
 <br>
 
 <p align="center">
-  <strong>Part of the Open Collection</strong>
+  <strong>Part of the Kovina Collection</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/sparshsam/openreader">OpenReader</a> ·
+  <a href="https://github.com/sparshsam/openjournal">OpenJournal</a> ·
+  <a href="https://github.com/sparshsam/openledger">OpenLedger</a> ·
+  <a href="https://github.com/sparshsam/opentone">OpenTone</a> ·
+  <a href="https://github.com/sparshsam/openpalette">OpenPalette</a> ·
+  <a href="https://github.com/sparshsam/openconvert">OpenConvert</a>
 </p>
 
 <p align="center">
   <a href="https://github.com/sparshsam/opensnap">OpenSnap</a> ·
-  <a href="https://github.com/sparshsam/openledger">OpenLedger</a> ·
+  <a href="https://github.com/sparshsam/worldclock-widget">WorldClock Widget</a> ·
   <a href="https://github.com/sparshsam/openproof">OpenProof</a> ·
-  <a href="https://github.com/sparshsam/opensend">OpenSend</a>
+  <a href="https://github.com/sparshsam/opensend">OpenSend</a> ·
+  <a href="https://github.com/sparshsam/opensprout">OpenSprout</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/sparshsam/wordwise">WordWise</a> ·
+  <a href="https://github.com/sparshsam/openscrabble">OpenScrabble</a> ·
+  <a href="https://github.com/sparshsam/chess">Chess</a> ·
+  <a href="https://github.com/sparshsam/hisstastic">Hisstastic</a>
 </p>
 
 <p align="center">
