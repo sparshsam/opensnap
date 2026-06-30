@@ -4,7 +4,7 @@ A minimal, always-on-top desktop screenshot widget for Windows.
 
 **Stack:** C# WPF on .NET 8, Windows-only desktop app
 **Repo:** https://github.com/sparshsam/opensnap
-**Latest tag:** v0.6.0
+**Latest tag:** v0.7.0
 
 ---
 
@@ -14,7 +14,7 @@ A minimal, always-on-top desktop screenshot widget for Windows.
 /home/spars/repos/opensnap/           # Git repo root
 ├── OpenShot.csproj                   # .NET 8 WPF + WinRT project
 ├── App.xaml / .cs                    # Entry point, capture dispatch, tray wiring
-├── MainWindow.xaml / .cs             # Floating glass widget (80×36 pill)
+├── MainWindow.xaml / .cs             # Floating glass widget (240×36 triple-button pill)
 ├── AppSettings.cs                    # JSON settings → %APPDATA%\OpenSnap\
 ├── ScreenshotService.cs              # Capture, save, clipboard, filename template
 ├── CaptureService.cs                 # Active window + area capture + CaptureMode enum
@@ -50,7 +50,7 @@ build-installer.bat
 
 # Output: bin/Release/net8.0-windows10.0.19041.0/OpenSnap.dll
 # Published: release/OpenSnap.exe
-# Installer: dist/OpenSnap-Setup-v0.6.0.exe
+# Installer: dist/OpenSnap-Setup-v0.7.0.exe
 ```
 
 The app targets `net8.0-windows10.0.19041.0` for access to `Windows.Media.Ocr`.
@@ -66,15 +66,22 @@ The app targets `net8.0-windows10.0.19041.0` for access to `Windows.Media.Ocr`.
 
 ## Widget design
 
-- 80×36 px translucent glass capsule with drop shadow
-- Camera icon centred as the visual mark
+- 240×36 px translucent glass capsule with drop shadow, divided into 3 sections
+- Left (toggle): area selection — selection-box icon, blue glow when active
+- Center (default): full screen — camera icon
+- Right: active window — window icon
+- Spring-back bounce animation (BackEase, 400ms) on button press
+- Green border flash (#007a3f) after capture
+- Hover glow per section, glass dividers between sections
 - Always-on-top, draggable via threshold-based click-vs-drag
 
-## Input reference
+## Input reference (widget sections, 240px pill)
 
 | Input | Action |
 |---|---|
-| Left-click | Capture full screen |
+| Left-click — left third | Area selection (toggle, blue glow) |
+| Left-click — center third | Full screen capture |
+| Left-click — right third | Active window capture |
 | Right-click | Open mode context menu |
 | Middle-click | Capture active window |
 | Drag | Move widget |
@@ -160,3 +167,4 @@ gh release upload v0.x.x dist/OpenSnap-Setup-v0.x.x.exe
 | v0.5.0 | Windows OCR (Capture + OCR), renamed from OpenShot |
 | v0.5.1 | Stabilisation, naming cleanup, README rewrite |
 | v0.6.0 | Inno Setup installer, hotkey config in Settings, About dialog, area selection fix, active window fix, settings crash fix |
+| v0.7.0 | Triple-button pill (240px), bounce animation, green flash, per-section hover + toggle, exit menu, v0.7 fix pass, docs |

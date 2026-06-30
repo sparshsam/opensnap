@@ -1,6 +1,6 @@
 # OpenSnap — Project Status
 
-**Version:** v0.6.0 (installer & distribution release)
+**Version:** v0.7.0 (triple-button pill UX release)
 **Status:** Active development, early stage
 **Target:** Windows 10/11 desktop screenshot widget
 
@@ -9,10 +9,12 @@
 ## Current state
 
 Functional MVP with core capture modes, OCR, global hotkeys, and a proper
-Inno Setup installer. The widget is a floating 80×36 glass capsule that lives
-always-on-top. Settings now include hotkey re-binding, capture sound toggle,
-and filename template editing. An About dialog shows version info and a
-GitHub link.
+Inno Setup installer. The widget is a floating 240×36 glass capsule divided
+into three clickable sections (area-selection toggle, full-screen capture,
+active-window capture) with spring-back bounce feedback, green flash, and
+per-section hover glow. Settings include hotkey re-binding, capture sound
+toggle, and filename template editing. An About dialog shows version info
+and a GitHub link. Exit option in the context menu.
 
 ## What works
 
@@ -27,6 +29,12 @@ GitHub link.
 - Capture shutter sound
 - Settings dialog (save path, always-on-top, startup, sound, template, hotkeys)
 - About dialog (version, GitHub link, license)
+- **240×36 triple-button pill** — left (area toggle), center (full screen), right (active window)
+- **Spring-back bounce animation** on each button press (BackEase, per-section ScaleTransform)
+- **Green border flash** (#007a3f) on capture
+- **Hover glow** per section, glass dividers
+- **Area selection toggle** — blue glow when active, resets on capture/cancel
+- **Exit menu item** in right-click context menu
 - Glass UI with drop shadow, draggable, position persists
 - Off-screen position clamping
 - Double-click suppression
@@ -41,13 +49,14 @@ GitHub link.
 ### Known rough edges
 - **CLI:** Not published as a CLI tool / no command-line arguments yet
 - **OCR:** No language selection — uses user profile languages
-- **Scaling:** Widget dimensions fixed at 80×36 CSS pixels; may need DPI
-  awareness verification
+- **Scaling:** Widget dimensions fixed at 240×36 CSS pixels; DPI awareness
+  verification still needed
 - **Multi-monitor:** Area selection overlay covers virtual screen; selection
   rect may have offset issues on non-primary monitors with different DPIs
 - **First-launch flow:** No onboarding or tooltip on first run
 - **Error handling:** OCR failures silently return empty string
 - **Installer:** Not code-signed (SmartScreen warning on first run)
+- **Auto-update:** Not yet implemented — users must manually download new releases
 
 ### No test coverage
 - Zero unit tests
@@ -60,15 +69,28 @@ GitHub link.
 - No CI/CD pipeline
 - Installer built with Inno Setup (`build-installer.bat`)
 
-## Upcoming / planned
+## Roadmap
 
+### v0.7 — Quality (current)
+- [x] Fix bugs found by users
+- [ ] Improve DPI scaling
+- [ ] Multi-monitor edge cases
+- [ ] Performance profiling
+- [ ] Accessibility review
+- [ ] Release installer + tag v0.7.0
+
+### v0.8 — Enterprise polish
+- [ ] Signed executable (code-signing certificate)
+- [ ] MSIX as additional distribution option (keep Inno Setup too)
+- [ ] Automatic update checking from GitHub Releases
+- [ ] Better installer branding
+
+### Future / stretch
 - Region/capture presets
 - Image format options (JPEG, BMP)
 - Upload to clipboard / cloud
 - Custom overlay styling
 - First-run tooltip / onboarding
-- DPI awareness improvements
-- Code signing for installer
 
 ## Architecture notes
 
