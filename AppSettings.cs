@@ -62,6 +62,9 @@ public sealed class AppSettings
     // v0.8.0 — show quick-actions popup after capture
     public bool ShowQuickActions { get; set; } = true;
 
+    // v0.9.6 — save only (skip clipboard copy)
+    public bool SaveOnly { get; set; } = false;
+
     // v0.9.5 — accessibility
     public bool LargeIcons { get; set; } = false;
 

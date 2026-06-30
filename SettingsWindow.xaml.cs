@@ -93,6 +93,7 @@ public partial class SettingsWindow : Window
         LargeIconsCheck.IsChecked = _settings.LargeIcons;
         CustomAppBox.Text = _settings.CustomAppPath;
         QuickActionsCheck.IsChecked = _settings.ShowQuickActions;
+        SaveOnlyCheck.IsChecked = _settings.SaveOnly;
 
         // Full screen hotkey
         SelectModCombo(FullScreenModCombo, _settings.HotkeyCaptureModifiers);
@@ -174,6 +175,7 @@ public partial class SettingsWindow : Window
         _settings.UseSequentialNumbering = SeqNumberCheck.IsChecked ?? false;
         _settings.DateSubfolders = DateFoldersCheck.IsChecked ?? false;
         _settings.ShowQuickActions = QuickActionsCheck.IsChecked ?? true;
+        _settings.SaveOnly = SaveOnlyCheck.IsChecked ?? false;
         _settings.Save();
 
         StartupManager.SetStartup(_settings.LaunchAtStartup);

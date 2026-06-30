@@ -28,7 +28,7 @@ public sealed class TrayService : IDisposable
     public event Action<int>? PinHistoryItemRequested;
     public event Action<int>? DeleteHistoryItemRequested;
     public event Action? ClearHistoryRequested;
-    public event Action<string>? SearchHistoryRequested;
+    public event Action? SearchHistoryRequested;
     public event Action? CheckUpdateRequested;
     public event Action? QuitRequested;
 
@@ -68,6 +68,9 @@ public sealed class TrayService : IDisposable
             StartupToggleRequested?.Invoke(_startupItem.Checked);
         };
 
+        var searchItem = new Forms.ToolStripMenuItem("Search history…");
+        searchItem.Click += (_, _) => SearchHistoryRequested?.Invoke();
+
         var updateItem = new Forms.ToolStripMenuItem("Check for updates");
         updateItem.Click += (_, _) => CheckUpdateRequested?.Invoke();
 
@@ -84,6 +87,7 @@ public sealed class TrayService : IDisposable
             _openLastItem,
             _revealItem,
             _copyPathItem,
+            searchItem,
             _historyItem,
             new Forms.ToolStripSeparator(),
             _startupItem,

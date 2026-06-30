@@ -1,6 +1,7 @@
 using System.IO;
 using System.Media;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -17,6 +18,9 @@ public partial class App : System.Windows.Application
     private HotkeyService? _hotkeys;
     private UpdateService? _updater;
 
+    // Single-instance mutex
+    private Mutex? _instanceMutex;
+
     // Fullscreen detection timer
     private System.Windows.Threading.DispatcherTimer? _fullscreenTimer;
     private bool _isWidgetHiddenByFullscreen;
@@ -24,6 +28,22 @@ public partial class App : System.Windows.Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // Enforce single instance
+        _instanceMutex = new Mutex(true, "OpenSnap-Instance-Mutex", out bool createdNew);
+        if (!createdNew)
+        {
+            // Another instance is already running — bring it to the foreground
+            var existingHwnd = NativeMethods.FindWindow(null, "OpenSnap");
+            if (existingHwnd != IntPtr.Zero)
+            {
+                NativeMethods.SetForegroundWindow(existingHwnd);
+                NativeMethods.ShowWindow(existingHwnd, NativeMethods.SW_RESTORE);
+                NativeMethods.FlashWindow(existingHwnd, true);
+            }
+            Current.Shutdown();
+            return;
+        }
 
         // Redirect unhandled exceptions to log file
         AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
@@ -56,6 +76,7 @@ public partial class App : System.Windows.Application
         _tray.PinHistoryItemRequested += OnPinHistoryItem;
         _tray.DeleteHistoryItemRequested += OnDeleteHistoryItem;
         _tray.ClearHistoryRequested += OnClearHistory;
+        _tray.SearchHistoryRequested += OnSearchHistory;
         _tray.CheckUpdateRequested += OnCheckUpdate;
         _tray.UpdateNotificationClicked += OnUpdateNotificationClicked;
         _tray.QuitRequested += OnQuit;
@@ -94,6 +115,11 @@ public partial class App : System.Windows.Application
     protected override void OnExit(ExitEventArgs e)
     {
         _hotkeys?.Dispose();
+
+        // Release the single-instance mutex
+        try { _instanceMutex?.ReleaseMutex(); _instanceMutex?.Dispose(); }
+        catch { /* best-effort */ }
+
         if (_widget != null && _settings != null)
         {
             _settings.WindowLeft = _widget.Left;
@@ -158,7 +184,8 @@ public partial class App : System.Windows.Application
             var fullPath = Path.Combine(saveFolder, fileName);
 
             ScreenshotService.SaveAsPng(source, fullPath);
-            ScreenshotService.CopyToClipboard(source);
+            if (!_settings.SaveOnly)
+                ScreenshotService.CopyToClipboard(source);
 
             // OCR mode: extract text
             string ocrText = "";
@@ -233,6 +260,23 @@ public partial class App : System.Windows.Application
 
     [StructLayout(LayoutKind.Sequential)]
     private struct RECT { public int Left; public int Top; public int Right; public int Bottom; }
+
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    private static extern IntPtr FindWindow(string? lpClassName, string lpWindowName);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool FlashWindow(IntPtr hWnd, [MarshalAs(UnmanagedType.Bool)] bool bInvert);
+
+    private const int SW_RESTORE = 9;
 
     private void StartFullscreenMonitor()
     {
@@ -405,6 +449,20 @@ public partial class App : System.Windows.Application
         _settings.Save();
         _tray?.UpdateHistory(_settings.ScreenshotHistory, _settings.PinnedCaptures);
         _tray?.SetHistoryActionsEnabled(false);
+    }
+
+    private void OnSearchHistory()
+    {
+        var dialog = new SearchHistoryDialog(
+            _settings?.ScreenshotHistory ?? new(),
+            _settings?.PinnedCaptures);
+        dialog.FileSelected += path =>
+        {
+            try { System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\""); }
+            catch { }
+        };
+        dialog.Owner = _widget;
+        dialog.ShowDialog();
     }
 
     private async void OnCheckUpdate()

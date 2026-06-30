@@ -51,6 +51,7 @@
             <CheckBox x:Name="EdgeSnapCheck" Content="Magnetic edge snapping" Margin="0,0,0,4" Checked="OnToggleChanged" Unchecked="OnToggleChanged" />
             <CheckBox x:Name="AutoHideCheck" Content="Auto-hide when fullscreen app is active" Margin="0,0,0,4" Checked="OnToggleChanged" Unchecked="OnToggleChanged" />
             <CheckBox x:Name="QuickActionsCheck" Content="Show quick-actions popup after capture" Margin="0,0,0,4" Checked="OnToggleChanged" Unchecked="OnToggleChanged" />
+            <CheckBox x:Name="SaveOnlyCheck" Content="Save only (don't copy to clipboard)" Margin="0,0,0,4" Checked="OnToggleChanged" Unchecked="OnToggleChanged" />
         </StackPanel>
 
         <!-- Opacity slider -->
