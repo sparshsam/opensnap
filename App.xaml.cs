@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Media;
 using System.Runtime.InteropServices;
@@ -27,6 +28,7 @@ public partial class App : System.Windows.Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        var _startupTimer = Stopwatch.StartNew();
         base.OnStartup(e);
 
         // Enforce single instance
@@ -110,6 +112,10 @@ public partial class App : System.Windows.Application
 
         // Periodic tray health check (handles Explorer restart)
         StartTrayHealthCheck();
+
+        _startupTimer.Stop();
+        BenchmarkLog("startup", _startupTimer.ElapsedMilliseconds);
+        BenchmarkLog("memory_startup", GC.GetTotalMemory(false) / 1024, "KB");
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -135,6 +141,7 @@ public partial class App : System.Windows.Application
 
     private async void DispatchCapture(CaptureMode mode)
     {
+        var _captureTimer = Stopwatch.StartNew();
         try
         {
             BitmapSource? source = null;
@@ -217,6 +224,9 @@ public partial class App : System.Windows.Application
             {
                 _tray?.Notify("OpenSnap", $"Saved  \u2022  {fileName}");
             }
+
+            _captureTimer.Stop();
+            BenchmarkLog($"capture_{mode}", _captureTimer.ElapsedMilliseconds, fileName);
         }
         catch (Exception ex)
         {
@@ -277,6 +287,28 @@ public partial class App : System.Windows.Application
     private static extern bool FlashWindow(IntPtr hWnd, [MarshalAs(UnmanagedType.Bool)] bool bInvert);
 
     private const int SW_RESTORE = 9;
+
+    // ── Benchmark logger ───────────────────────────────────────────────
+
+    private static readonly string BenchmarkPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "OpenSnap", "logs", "benchmark.csv");
+
+    private static void BenchmarkLog(string label, long elapsedMs, string? detail = null)
+    {
+        try
+        {
+            var dir = Path.GetDirectoryName(BenchmarkPath);
+            if (dir is not null) Directory.CreateDirectory(dir);
+
+            bool header = !File.Exists(BenchmarkPath);
+            using var w = new StreamWriter(BenchmarkPath, append: true);
+            if (header)
+                w.WriteLine("timestamp,label,elapsed_ms,detail");
+            w.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff},{label},{elapsedMs},{detail ?? ""}");
+        }
+        catch { /* best-effort */ }
+    }
 
     private void StartFullscreenMonitor()
     {

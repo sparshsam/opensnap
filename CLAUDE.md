@@ -56,7 +56,7 @@ ready for Partner Center upload. The Inno Setup installer is on the GitHub Relea
 | `setup.iss` | Inno Setup installer config |
 | `package-msix.ps1` | MSIX package builder |
 | `Resources/Lang/*.json` | Translation files (en/fr/de/es/ja) |
-| `assets/branding/` | Logo SVGs/PNGs, brand assets |
+| `assets/branding/` | Brand assets (logos, screenshots) |
 
 ## Settings fields
 
@@ -132,8 +132,6 @@ Then upload MSIX to Partner Center.
 ```
 opensnap/
 ├── assets/branding/        # Logo SVGs, PNGs, brand assets
-├── assets/hero/            # README hero graphic
-├── assets/icons/           # App icons
 ├── assets/screenshots/     # Product screenshots (add as needed)
 ├── docs/                   # Developer documentation
 ├── .github/ISSUE_TEMPLATE/ # Bug report + feature request templates
