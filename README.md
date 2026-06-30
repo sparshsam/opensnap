@@ -1,198 +1,150 @@
-# OpenSnap
+<p align="center">
+  <img src="assets/branding/app.ico" width="64" height="64" alt="OpenSnap">
+</p>
 
-A minimal, always-on-top desktop screenshot widget for Windows.
+<h1 align="center">OpenSnap</h1>
 
-Click anywhere on the glass capsule to grab the full multi-monitor desktop,
-save it as PNG to your Desktop, and copy it to your clipboard — all in one
-click. Or right-click for capture modes including OCR text extraction.
+<p align="center">
+  <strong>A floating screenshot widget for Windows — one click, saved and copied.</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/sparshsam/opensnap/releases/latest">
+    <img src="https://img.shields.io/badge/download-latest%20release-007a3f?style=for-the-badge&logo=github" alt="Download">
+  </a>
+  <a href="https://github.com/sparshsam/opensnap">
+    <img src="https://img.shields.io/badge/source%20code-github-181717?style=for-the-badge&logo=github" alt="Source Code">
+  </a>
+</p>
+
+<br>
+
+<p align="center">
+  <img src="assets/hero/hero.svg" width="720" alt="OpenSnap hero screenshot" style="border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.15);">
+</p>
+
+<br>
+
+---
+
+<br>
+
+## Why OpenSnap
+
+Every screenshot tool is either bloated, buried in menus, or requires three clicks before you get an image. OpenSnap lives on your screen as a translucent glass capsule — click to capture, drag to move. That's it.
+
+<br>
 
 ## Features
 
-- Compact glass capsule (~80 × 36 px), draggable anywhere
-- Subtle drop shadow, translucent frosted-glass appearance
-- Always-on-top
-- Full multi-monitor desktop capture
-- Active window capture (foreground window only)
-- Area selection (fullscreen drag-select overlay)
-- **Capture + OCR** — extracts text via built-in Windows OCR, copies to clipboard
-- Saves to **Desktop** by default (configurable)
-- Auto-generates filenames with customisable template
-- Copies image to clipboard automatically (retries 3× if locked)
-- Copies OCR text to clipboard automatically
-- Global hotkeys: Win+Shift+S (full screen), Win+Shift+W (active window)
-- Screenshot history (last 20) in tray menu
-- Optional capture shutter sound
-- System tray icon with context menu
-- Launch at startup toggle
-- Settings persist to `%APPDATA%\OpenSnap\settings.json`
-- Startup position clamped to visible work area
-- Error handling for missing folders, clipboard issues, capture failures
+<table>
+  <tr>
+    <td width="50%">
+      <h3>📷 One-click capture</h3>
+      <p>Full multi-monitor desktop, active window, or drag-select an area. All from the same floating pill.</p>
+    </td>
+    <td width="50%">
+      <h3>📝 OCR built in</h3>
+      <p>Extract text from any screen region using Windows OCR. Copied to clipboard alongside the image.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3>🎯 Three-button pill</h3>
+      <p>Area selection (toggle), full screen, active window — each with its own tactile bounce animation.</p>
+    </td>
+    <td width="50%">
+      <h3>⌨️ Global hotkeys</h3>
+      <p>Win+Shift+S for full screen, Win+Shift+W for active window. Customisable in Settings.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3>📂 Screenshot history</h3>
+      <p>Last 20 captures in the tray menu. Pin, delete, or clear individual entries.</p>
+    </td>
+    <td width="50%">
+      <h3>🎨 Quick actions</h3>
+      <p>After capture: copy, OCR, open in Paint, reveal in Explorer, or open with your preferred editor.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3>🔤 Smart naming</h3>
+      <p>Custom filename templates with project prefixes, sequential numbering, and date-based subfolders.</p>
+    </td>
+    <td width="50%">
+      <h3>🌐 5 languages</h3>
+      <p>English, French, German, Spanish, Japanese. Switch anytime in Settings.</p>
+    </td>
+  </tr>
+</table>
 
-## Input reference
+<br>
 
-| Input | Action |
-|---|---|
-| **Left-click** | Capture full screen |
-| **Right-click** | Open capture mode menu |
-| **Middle-click** | Capture active window |
-| **Double-click** | Suppressed (avoids double-save) |
-| **Drag** | Move widget |
-| **Win+Shift+S** | Capture full screen (global) |
-| **Win+Shift+W** | Capture active window (global) |
+## Designed For
 
-Right-click menu: Full screen / Active window / Area selection / Capture + OCR / Settings
+People who take screenshots dozens of times a day — developers, designers, support agents, writers, and anyone who values speed over menu hunting.
 
-## Prerequisites
+No login, no cloud, no telemetry. It saves to your Desktop and gets out of your way.
 
-- Windows 10 / 11
-- [.NET 8 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) installed
+<br>
 
-## Installation
+## Design Philosophy
 
-### Download
-Download the latest installer from the [Releases](https://github.com/sparshsam/opensnap/releases) page:
+> *"A screenshot tool shouldn't feel like an application. It should feel like part of the screen."*
 
-```
-OpenSnap-Setup-v0.6.0.exe
-```
+Translucent glass, minimal footprint (240 × 36 px), always-on-top, and zero chrome. The widget is intentionally not an app window — it's a utility that sits at the edge of your workflow.
 
-### Install
-1. Run `OpenSnap-Setup-v0.6.0.exe`
-2. Choose whether to create a desktop shortcut
-3. Launch OpenSnap from the Start Menu or desktop shortcut
+<br>
 
-The app is installed to `%LOCALAPPDATA%\Programs\OpenSnap`.  
-Settings are stored separately at `%APPDATA%\OpenSnap\settings.json` and are never touched during upgrades.
+## Built With
 
-### Upgrade
-The installer replaces all program files. Your settings (`%APPDATA%\OpenSnap\settings.json`) are preserved automatically — no migration step needed. Just run the new installer over the old installation.
+<p align="left">
+  <img src="https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=csharp&logoColor=white" alt="C#">
+  <img src="https://img.shields.io/badge/WPF-512BD4?style=for-the-badge&logo=windows&logoColor=white" alt="WPF">
+  <img src="https://img.shields.io/badge/.NET%208-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 8">
+  <img src="https://img.shields.io/badge/Windows%2010%2F11-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows 10/11">
+</p>
 
-### Uninstall
-**Via Settings → Apps:**
-1. Open **Settings → Apps → Installed apps**
-2. Search for **OpenSnap**
-3. Click **Uninstall**
+<br>
 
-**Via Start Menu:**
-1. Open the Start Menu and find **OpenSnap**
-2. Right-click → **Uninstall**
-
-Running the installer again also gives the option to remove OpenSnap.
-
-### Troubleshooting
-
-| Problem | Fix |
-|---------|-----|
-| "Windows protected your PC" (SmartScreen) | Click **More info → Run anyway**. The installer is signed by the developer certificate. |
-| App won't start | Ensure [.NET 8 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is installed. |
-| Settings lost after upgrade | Settings are stored in `%APPDATA%\OpenSnap\` and are never deleted by the installer. If missing, check that directory still exists. |
-| OCR not working | OCR uses Windows language packs. Go to **Settings → Time & Language → Language & region** and install your language's speech/OCR support. |
-
-## Build
-
-```cmd
-cd C:\Users\spars\repos\opensnap
-dotnet restore
-dotnet build -c Release
-```
-
-## Publish & package
-
-```cmd
-dotnet publish -c Release -o release
-```
-
-Output: `release\OpenSnap.exe` (~170 KB, framework-dependent, instant launch).
-
-### Build installer
-
-```cmd
-build-installer.bat
-```
-
-Requires [Inno Setup 6](https://jrsoftware.org/isdl.php) installed at `C:\Program Files (x86)\Inno Setup 6`.
-
-Output: `dist\OpenSnap-Setup-v0.6.0.exe` (~5.5 MB).
-
-## Run
-
-Double-click **OpenSnap.lnk** on the desktop, or run `dotnet run -c Release`.
-
-## Startup behavior
-
-When **Launch at startup** is toggled on (via the tray menu), OpenSnap
-registers itself under:
+## Version Journey
 
 ```
-HKCU\Software\Microsoft\Windows\CurrentVersion\Run\OpenSnap
+v0.1  ·  Initial glass capsule, basic capture      Nov 2024
+v0.5  ·  OCR, rename to OpenSnap                     Jan 2025
+v0.6  ·  Installer, About dialog, settings fixes     Mar 2025
+v0.7  ·  Triple-button pill, bounce, green flash     Jun 2026
+v0.8  ·  Quick actions, naming, history pinning      Jun 2026
+v0.9  ·  Languages, accessibility, auto-update       Jun 2026
 ```
 
-The app starts automatically on Windows login. It lives in the system tray.
+Full changelog → [CHANGELOG.md](CHANGELOG.md)
 
-## Settings
+<br>
 
-Stored at `%APPDATA%\OpenSnap\settings.json`. Configurable fields:
+## License
 
-| Field | Default | Description |
-|---|---|---|
-| `SavePath` | Desktop | Folder for screenshots |
-| `AlwaysOnTop` | true | Widget stays above other windows |
-| `LaunchAtStartup` | false | Auto-start with Windows |
-| `PlayCaptureSound` | true | Play shutter sound on capture |
-| `FilenameTemplate` | `screenshot-{yyyy}-{MM}-{dd}-{HHmmss}` | Template with `{yyyy}`, `{MM}`, `{dd}`, `{HH}`, `{mm}`, `{ss}`, `{HHmmss}` |
-| `ScreenshotHistory` | [] | Last 20 saved file paths |
+[MIT](LICENSE) © Sparsh
 
-## Project structure
+<br>
 
-```
-opensnap/                        # Git repository root
-├── OpenSnap.csproj              # .NET 8 WPF + WinRT project
-├── App.xaml / .cs               # Entry point, capture dispatch, tray wiring
-├── MainWindow.xaml / .cs        # Floating glass widget
-├── AppSettings.cs               # JSON settings persistence
-├── ScreenshotService.cs         # Capture, save, clipboard, filename template
-├── CaptureService.cs            # Active window + area capture
-├── OcrService.cs                # Windows OCR text extraction
-├── HotkeyService.cs             # Global hotkeys (RegisterHotKey)
-├── TrayService.cs               # System tray icon + context menu
-├── StartupManager.cs            # Registry Run key management
-├── AreaSelectorWindow           # Fullscreen drag-select overlay
-├── SettingsWindow               # Settings dialog (hotkeys, sound, template)
-├── AboutDialog                  # About dialog (version, GitHub, license)
-├── Resources/app.ico            # Application icon
-├── Resources/capture.wav        # Shutter sound
-├── setup.iss                    # Inno Setup installer script
-├── build-installer.bat          # Build + installer packaging script
-├── README.md
-└── .gitignore
-```
+---
 
+<br>
 
+<p align="center">
+  <strong>Part of the Open Collection</strong>
+</p>
 
-## QA checklist (v0.6.0)
+<p align="center">
+  <a href="https://github.com/sparshsam/opensnap">OpenSnap</a> ·
+  <a href="https://github.com/sparshsam/openledger">OpenLedger</a> ·
+  <a href="https://github.com/sparshsam/openproof">OpenProof</a> ·
+  <a href="https://github.com/sparshsam/opensend">OpenSend</a>
+</p>
 
-- [ ] Installer runs and installs to `%LOCALAPPDATA%\Programs\OpenSnap`
-- [ ] Start Menu shortcut created
-- [ ] Desktop shortcut created (when selected)
-- [ ] OpenSnap launches from Start Menu
-- [ ] Uninstall removes all program files
-- [ ] Settings preserved after reinstall (upgrade)
-- [ ] Settings → About shows correct version and GitHub link
-- [ ] Settings → Hotkey combos change saved and applied
-- [ ] Play capture sound toggle works
-- [ ] Full screen capture saves PNG to Desktop
-- [ ] Active window capture captures only the focused window (not the widget)
-- [ ] Area selection overlay captures the selected region
-- [ ] Capture + OCR saves image AND copies extracted text
-
-## Release history
-
-| Tag | Date | Highlights |
-|---|---|---|
-| v0.1.1 | — | Initial build, basic pill widget, tray icon, settings |
-| v0.1.2 | — | Camera centering, Desktop save, glass UI, rectangular backing fix |
-| v0.2.0 | — | Capture modes (active window, area selection), settings dialog |
-| v0.4.0 | — | Global hotkeys, middle-click, history, capture sound, filename templates |
-| v0.5.0 | — | Windows OCR (Capture + OCR), renamed OpenShot → OpenSnap |
-| **v0.5.1** | — | **Stabilisation: naming cleanup, README rewrite, packaging verified** |
-| **v0.6.0** | — | **Installer & distribution: Inno Setup packaging, About dialog, hotkey config in settings, area selection fix, active window fix** |
+<p align="center">
+  <sub>Minimal, focused tools for everyday tasks.</sub>
+</p>
