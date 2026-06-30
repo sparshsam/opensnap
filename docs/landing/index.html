@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenSnap — A screenshot tool that feels like part of the screen</title>
+  <meta name="description" content="A floating screenshot widget for Windows — one click, saved and copied. Minimal, fast, private.">
+  <link rel="canonical" href="https://snap.kovina.org/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* ── Theme ────────────────────────────────────────────────────── */
+    :root {
+      --bg: #f9f9f9;
+      --text: #1a1a1a;
+      --text-secondary: #6b6b6b;
+      --text-muted: #9a9a9a;
+      --accent: #007a3f;
+      --accent-hover: #009e51;
+      --accent-glow: rgba(0, 122, 63, 0.15);
+      --divider: #e5e5e5;
+      --surface-muted: #f0f0f0;
+      --hero-badge-bg: #e8f5ee;
+      --hero-badge-text: #007a3f;
+      --card-border: #e5e5e5;
+    }
+    [data-theme="dark"] {
+      --bg: #0d0d0d;
+      --text: #ededed;
+      --text-secondary: #8a8a8a;
+      --text-muted: #5c5c5c;
+      --accent: #00cc66;
+      --accent-hover: #00e678;
+      --accent-glow: rgba(0, 204, 102, 0.1);
+      --divider: #1f1f1f;
+      --surface-muted: #161616;
+      --hero-badge-bg: rgba(0, 204, 102, 0.1);
+      --hero-badge-text: #00cc66;
+      --card-border: #1f1f1f;
+    }
+
+    body { background: var(--bg); color: var(--text); }
+
+    /* ── Typography ───────────────────────────────────────────────── */
+    h1, h2, h3 { font-weight: 700; line-height: 1.2; }
+    p { color: var(--text-secondary); }
+
+    /* ── Layout ───────────────────────────────────────────────────── */
+    .container { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Header ───────────────────────────────────────────────────── */
+    header {
+      position: sticky; top: 0; z-index: 50;
+      background: var(--bg);
+      transition: background-color 0.3s ease;
+    }
+    header .inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--text);
+      font-size: 17px; font-weight: 600;
+    }
+    .logo svg { display: block; }
+    .nav-group { display: flex; align-items: center; gap: 6px; }
+
+    /* ── Theme Toggle ─────────────────────────────────────────────── */
+    .theme-toggle {
+      background: none; border: none; cursor: pointer;
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary);
+      transition: background 0.2s, color 0.2s;
+    }
+    .theme-toggle:hover { background: var(--surface-muted); color: var(--text); }
+    .theme-toggle .sun { display: none; }
+    .theme-toggle .moon { display: block; }
+    [data-theme="dark"] .theme-toggle .sun { display: block; }
+    [data-theme="dark"] .theme-toggle .moon { display: none; }
+
+    /* ── Hero ─────────────────────────────────────────────────────── */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+    .hero-icon {
+      margin-bottom: 28px;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .hero-icon svg { display: block; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--hero-badge-bg); color: var(--hero-badge-text);
+      font-size: 13px; font-weight: 600;
+      padding: 6px 14px; border-radius: 999px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: 48px; font-weight: 800;
+      letter-spacing: -0.03em;
+      max-width: 640px; margin: 0 auto 20px;
+    }
+    .hero p.sub {
+      font-size: 18px; color: var(--text-secondary);
+      max-width: 480px; margin: 0 auto 36px;
+    }
+    .hero-actions {
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff;
+      font-size: 15px; font-weight: 600;
+      padding: 14px 32px; border-radius: 999px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface-muted); color: var(--text);
+      font-size: 15px; font-weight: 600;
+      padding: 14px 28px; border-radius: 999px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover { opacity: 0.8; }
+    .hero-meta {
+      margin-top: 32px;
+      font-size: 13px; color: var(--text-muted);
+    }
+
+    /* ── Screenshot ───────────────────────────────────────────────── */
+    .screenshot-section { padding: 20px 0 80px; }
+    .screenshot-frame {
+      max-width: 720px; margin: 0 auto;
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.12);
+      transition: box-shadow 0.3s ease;
+    }
+    [data-theme="dark"] .screenshot-frame {
+      box-shadow: 0 4px 40px rgba(0,0,0,0.4);
+    }
+    .screenshot-frame img {
+      width: 100%; height: auto; display: block;
+    }
+
+    /* ── Features ─────────────────────────────────────────────────── */
+    .features {
+      padding: 80px 0;
+      border-top: 1px solid var(--divider);
+    }
+    .features h2 {
+      font-size: 14px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-muted);
+      margin-bottom: 48px; text-align: center;
+    }
+    .features-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px;
+    }
+    .feature h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .feature p  { font-size: 14px; line-height: 1.7; }
+
+    /* ── Section Pages (About / Terms / Privacy) ──────────────────── */
+    .page-section {
+      display: none;
+      padding: 60px 0 80px;
+    }
+    .page-section.active { display: block; }
+    .page-section .back {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 14px; font-weight: 500; color: var(--text-secondary);
+      text-decoration: none; cursor: pointer; background: none; border: none;
+      margin-bottom: 32px; padding: 0;
+    }
+    .page-section .back:hover { color: var(--text); }
+    .page-section h1 {
+      font-size: 32px; font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .page-section h2 {
+      font-size: 20px; font-weight: 600;
+      margin-top: 32px; margin-bottom: 12px;
+    }
+    .page-section p, .page-section li {
+      font-size: 15px; color: var(--text-secondary); line-height: 1.8;
+    }
+    .page-section ul { padding-left: 20px; }
+    .page-section li { margin-bottom: 6px; }
+    .page-section .content { max-width: 680px; }
+
+    /* ── Divider ──────────────────────────────────────────────────── */
+    .section-divider { border: none; border-top: 1px solid var(--divider); margin: 0; }
+
+    /* ── Footer ───────────────────────────────────────────────────── */
+    footer {
+      padding: 48px 0;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    footer .links { display: flex; align-items: center; gap: 20px; }
+    footer .links a {
+      font-size: 13px; color: var(--text-secondary); text-decoration: none;
+      transition: color 0.2s;
+    }
+    footer .links a:hover { color: var(--text); }
+    footer .copy {
+      font-size: 13px; color: var(--text-muted);
+    }
+
+    /* ── Responsive ───────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 32px; }
+      .hero p.sub { font-size: 16px; }
+      .features-grid { grid-template-columns: 1fr; gap: 32px; }
+      .features { padding: 48px 0; }
+      footer { flex-direction: column; align-items: center; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════ HEADER ════════════════════ -->
+  <header>
+    <div class="container inner">
+      <a href="#" class="logo" onclick="showHome(); return false;">
+        <svg width="22" height="22" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M33.08 30.05a1.23 1.23 0 0 1-1.24 1.23H17.16a1.23 1.23 0 0 1-1.24-1.23V20.25a1.23 1.23 0 0 1 1.24-1.23h4.42l.82-1.23a.7.7 0 0 1 .13-.07h3.96a.7.7 0 0 1 .12.07l.83 1.23h4.42a1.23 1.23 0 0 1 1.24 1.23v9.8Zm-1.24-12.23h-3.78l-.47-.7a1.2 1.2 0 0 0-1.12-.6h-3.96a1.2 1.2 0 0 0-1.12.6l-.46.7h-3.78a2.44 2.44 0 0 0-2.44 2.44v9.8a2.44 2.44 0 0 0 2.44 2.43h14.69a2.44 2.44 0 0 0 2.43-2.44V20.25a2.44 2.44 0 0 0-2.43-2.44Z" fill="currentColor"/>
+          <circle cx="24.5" cy="25.15" r="4.11" fill="currentColor"/>
+          <circle cx="24.5" cy="25.15" r="2.88" fill="var(--bg)"/>
+          <circle cx="18.17" cy="20.97" r="1.03" fill="currentColor"/>
+        </svg>
+        OpenSnap
+      </a>
+      <div class="nav-group">
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+          <svg class="sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <svg class="moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ════════════════════ HOME ════════════════════ -->
+    <section id="home">
+
+      <div class="hero">
+        <div class="hero-icon">
+          <svg width="48" height="48" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M33.08 30.05a1.23 1.23 0 0 1-1.24 1.23H17.16a1.23 1.23 0 0 1-1.24-1.23V20.25a1.23 1.23 0 0 1 1.24-1.23h4.42l.82-1.23a.7.7 0 0 1 .13-.07h3.96a.7.7 0 0 1 .12.07l.83 1.23h4.42a1.23 1.23 0 0 1 1.24 1.23v9.8Zm-1.24-12.23h-3.78l-.47-.7a1.2 1.2 0 0 0-1.12-.6h-3.96a1.2 1.2 0 0 0-1.12.6l-.46.7h-3.78a2.44 2.44 0 0 0-2.44 2.44v9.8a2.44 2.44 0 0 0 2.44 2.43h14.69a2.44 2.44 0 0 0 2.43-2.44V20.25a2.44 2.44 0 0 0-2.43-2.44Z" fill="currentColor"/>
+            <circle cx="24.5" cy="25.15" r="4.11" fill="currentColor"/>
+            <circle cx="24.5" cy="25.15" r="2.88" fill="var(--bg)"/>
+            <circle cx="18.17" cy="20.97" r="1.03" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="hero-badge">v1.0.0 — Stable Release</div>
+        <h1>A screenshot tool that feels like part of the screen</h1>
+        <p class="sub">240 × 36 px floating glass capsule. One click, saved and copied. No login, no cloud, no telemetry.</p>
+        <div class="hero-actions">
+          <a href="https://github.com/sparshsam/opensnap/releases/latest" class="btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download for Windows
+          </a>
+          <a href="https://github.com/sparshsam/opensnap" class="btn-secondary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            Source Code
+          </a>
+        </div>
+        <div class="hero-meta">Windows 10 / 11 &nbsp;·&nbsp; C# WPF &nbsp;·&nbsp; .NET 8 &nbsp;·&nbsp; MIT License</div>
+      </div>
+
+      <div class="screenshot-section">
+        <div class="screenshot-frame">
+          <img src="../../assets/screenshots/openshot-1.0.0.png" alt="OpenSnap floating widget on a dark desktop">
+        </div>
+      </div>
+
+      <div class="features">
+        <h2>Why OpenSnap</h2>
+        <div class="features-grid">
+          <div class="feature">
+            <h3>One-click capture</h3>
+            <p>Full multi-monitor desktop, active window, or drag-select an area. All from the same floating pill.</p>
+          </div>
+          <div class="feature">
+            <h3>OCR built in</h3>
+            <p>Extract text from any screen region using Windows OCR. Copied to clipboard alongside the image.</p>
+          </div>
+          <div class="feature">
+            <h3>Quick actions</h3>
+            <p>After capture: copy, OCR, open in Paint, reveal in Explorer, or open with your preferred editor.</p>
+          </div>
+          <div class="feature">
+            <h3>Global hotkeys</h3>
+            <p>Win+Shift+S for full screen, Win+Shift+W for active window. Configurable in Settings.</p>
+          </div>
+          <div class="feature">
+            <h3>Smart naming</h3>
+            <p>Custom filename templates with project prefixes, sequential numbering, and date-based subfolders.</p>
+          </div>
+          <div class="feature">
+            <h3>5 languages</h3>
+            <p>English, French, German, Spanish, Japanese. Switch anytime in Settings.</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════ ABOUT ════════════════════ -->
+    <section id="about" class="page-section">
+      <div class="content">
+        <button class="back" onclick="showHome()">← Back</button>
+        <h1>About OpenSnap</h1>
+        <p>Every screenshot tool is either bloated, buried in menus, or requires three clicks before you get an image. OpenSnap lives on your screen as a translucent glass capsule — click to capture, drag to move. That's it.</p>
+        <p>No login, no cloud, no telemetry. It saves to your Desktop and gets out of your way.</p>
+        <h2>Design Philosophy</h2>
+        <p><em>"A screenshot tool shouldn't feel like an application. It should feel like part of the screen."</em></p>
+        <p>Translucent glass, minimal footprint (240 × 36 px), always-on-top, and zero chrome. The widget is intentionally not an app window — it's a utility that sits at the edge of your workflow.</p>
+        <h2>Built With</h2>
+        <p>C# / WPF / .NET 8 — native Windows application. No web wrappers, no Electron, no unnecessary dependencies.</p>
+        <h2>Part of Kovina</h2>
+        <p>OpenSnap is part of the <a href="https://github.com/sparshsam" style="color:var(--accent);text-decoration:none;">Kovina collection</a> — minimal, focused tools for everyday tasks.</p>
+      </div>
+    </section>
+
+    <!-- ════════════════════ TERMS ════════════════════ -->
+    <section id="terms" class="page-section">
+      <div class="content">
+        <button class="back" onclick="showHome()">← Back</button>
+        <h1>Terms of Use</h1>
+        <p>OpenSnap is provided as free and open-source software under the MIT License.</p>
+        <h2>No Warranty</h2>
+        <p>The software is provided "as is", without warranty of any kind, express or implied. The authors are not liable for any damages arising from its use.</p>
+        <h2>Acceptance</h2>
+        <p>By using OpenSnap, you accept these terms. If you do not agree, do not use the software.</p>
+        <h2>License</h2>
+        <p>OpenSnap is released under the <a href="https://opensource.org/licenses/MIT" style="color:var(--accent);text-decoration:none;">MIT License</a>. You are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software.</p>
+      </div>
+    </section>
+
+    <!-- ════════════════════ PRIVACY ════════════════════ -->
+    <section id="privacy" class="page-section">
+      <div class="content">
+        <button class="back" onclick="showHome()">← Back</button>
+        <h1>Privacy Policy</h1>
+        <p>OpenSnap respects your privacy. Here's what you need to know:</p>
+        <h2>No Data Collection</h2>
+        <p>OpenSnap does not collect, store, or transmit any personal data, telemetry, usage statistics, or analytics. It operates entirely offline.</p>
+        <h2>No Network Access</h2>
+        <p>The app only connects to the internet when you explicitly check for updates. It does not phone home, track usage, or display advertisements.</p>
+        <h2>Local Storage</h2>
+        <p>Screenshots are saved to your local Desktop (or your chosen folder). Application settings are stored in <code>%APPDATA%/OpenSnap/settings.json</code>. Nothing is ever sent to a remote server.</p>
+        <h2>Third Parties</h2>
+        <p>OpenSnap has no third-party analytics, crash reporting, or advertising SDKs. It is a pure native Windows application.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="container">
+    <hr class="section-divider">
+    <footer>
+      <div class="links">
+        <a href="#" onclick="showAbout(); return false;">About</a>
+        <a href="#" onclick="showTerms(); return false;">Terms</a>
+        <a href="#" onclick="showPrivacy(); return false;">Privacy</a>
+        <a href="https://github.com/sparshsam/opensnap" target="_blank">GitHub</a>
+      </div>
+      <div class="copy">© Kovina</div>
+    </footer>
+  </div>
+
+  <script>
+    // ── Theme ─────────────────────────────────────────────────────────
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+    (function initTheme() {
+      const saved = localStorage.getItem('theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+
+    // ── Page navigation ──────────────────────────────────────────────
+    function hideAll() {
+      document.getElementById('home').style.display = 'none';
+      document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    }
+    function showHome() {
+      hideAll();
+      document.getElementById('home').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function showAbout()   { hideAll(); document.getElementById('about').classList.add('active');  window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function showTerms()   { hideAll(); document.getElementById('terms').classList.add('active');  window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function showPrivacy() { hideAll(); document.getElementById('privacy').classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    // ── Keyboard shortcuts ───────────────────────────────────────────
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { showHome(); }
+    });
+
+    // ── Logo icon follows theme ──────────────────────────────────────
+    const observer = new MutationObserver(() => {
+      document.querySelectorAll('.hero-icon circle[fill="var(--bg)"], .logo circle[fill="var(--bg)"]')
+        .forEach(el => el.setAttribute('fill', getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    // Initial sync
+    setTimeout(() => {
+      document.querySelectorAll('circle[fill="var(--bg)"]').forEach(el => {
+        el.setAttribute('fill', getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
+      });
+    }, 50);
+  </script>
+</body>
+</html>
