@@ -153,6 +153,47 @@ public static class CaptureService
         return BitmapToBitmapSource(bitmap);
     }
 
+    public static bool IsOwnWindow(IntPtr hWnd)
+    {
+        if (hWnd == IntPtr.Zero) return false;
+        uint otherPid = 0;
+        GetWindowThreadProcessId(hWnd, out otherPid);
+        return otherPid == Environment.ProcessId;
+    }
+
+    /// <summary>Get window rect via public API with simple out params.</summary>
+    public static bool GetWindowRect(IntPtr hWnd, out int left, out int top, out int width, out int height)
+    {
+        if (!NativeMethods.GetWindowRect(hWnd, out var rect))
+        {
+            left = top = width = height = 0;
+            return false;
+        }
+        left = rect.Left;
+        top = rect.Top;
+        width = rect.Right - rect.Left;
+        height = rect.Bottom - rect.Top;
+        return true;
+    }
+
+    /// <summary>Full-screen capture.</summary>
+    public static BitmapSource CaptureFullScreen()
+    {
+        var vs = System.Windows.Forms.SystemInformation.VirtualScreen;
+        return CaptureArea(vs.Left, vs.Top, vs.Width, vs.Height);
+    }
+
+    // ── DWM ────────────────────────────────────────────────────────────
+
+    private const int DWMWA_EXTENDED_FRAME_BOUNDS = 9;
+
+    [DllImport("dwmapi.dll", PreserveSig = true)]
+    private static extern int DwmGetWindowAttribute(IntPtr hwnd, int dwAttribute,
+        ref RECT pvAttribute, int cbAttribute);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
     // ── P/Invoke ─────────────────────────────────────────────────────
 
     [StructLayout(LayoutKind.Sequential)]

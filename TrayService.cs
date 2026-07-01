@@ -18,6 +18,9 @@ public sealed class TrayService : IDisposable
     private readonly Forms.ToolStripMenuItem _revealItem;
 
     public event Action? CaptureRequested;
+    public event Action? AreaCaptureRequested;
+    public event Action? ActiveWindowRequested;
+    public event Action? CaptureOcrRequested;
     public event Action? OpenFolderRequested;
     public event Action? ChangeFolderRequested;
     public event Action<bool>? StartupToggleRequested;
@@ -29,6 +32,7 @@ public sealed class TrayService : IDisposable
     public event Action<int>? DeleteHistoryItemRequested;
     public event Action? ClearHistoryRequested;
     public event Action? SearchHistoryRequested;
+    public event Action? SettingsRequested;
     public event Action? CheckUpdateRequested;
     public event Action? QuitRequested;
 
@@ -46,14 +50,26 @@ public sealed class TrayService : IDisposable
         var captureItem = new Forms.ToolStripMenuItem("Capture");
         captureItem.Click += (_, _) => CaptureRequested?.Invoke();
 
-        var openItem = new Forms.ToolStripMenuItem("Open Desktop folder");
-        openItem.Click += (_, _) => OpenFolderRequested?.Invoke();
+        var areaCaptureItem = new Forms.ToolStripMenuItem("Area Capture");
+        areaCaptureItem.Click += (_, _) => AreaCaptureRequested?.Invoke();
 
-        var changeItem = new Forms.ToolStripMenuItem("Change save folder…");
-        changeItem.Click += (_, _) => ChangeFolderRequested?.Invoke();
+        var activeWinItem = new Forms.ToolStripMenuItem("Active Window Capture");
+        activeWinItem.Click += (_, _) => ActiveWindowRequested?.Invoke();
+
+        var captureOcrItem = new Forms.ToolStripMenuItem("Capture + OCR");
+        captureOcrItem.Click += (_, _) => CaptureOcrRequested?.Invoke();
+
+        var settingsItem = new Forms.ToolStripMenuItem("Settings");
+        settingsItem.Click += (_, _) => SettingsRequested?.Invoke();
+
+        var updateItem = new Forms.ToolStripMenuItem("Check for Updates");
+        updateItem.Click += (_, _) => CheckUpdateRequested?.Invoke();
+
+        var openFolderItem = new Forms.ToolStripMenuItem("Open Save Folder");
+        openFolderItem.Click += (_, _) => OpenFolderRequested?.Invoke();
 
         // History submenu
-        _historyItem = new Forms.ToolStripMenuItem("Recent screenshots");
+        _historyItem = new Forms.ToolStripMenuItem("Recent Screenshots");
         _openLastItem = new Forms.ToolStripMenuItem("Open last screenshot");
         _openLastItem.Click += (_, _) => OpenLastScreenshotRequested?.Invoke();
         _copyPathItem = new Forms.ToolStripMenuItem("Copy file path");
@@ -61,18 +77,12 @@ public sealed class TrayService : IDisposable
         _revealItem = new Forms.ToolStripMenuItem("Reveal in Explorer");
         _revealItem.Click += (_, _) => RevealInExplorerRequested?.Invoke();
 
-        _startupItem = new Forms.ToolStripMenuItem("Launch at startup");
+        _startupItem = new Forms.ToolStripMenuItem("Launch at Startup");
         _startupItem.Click += (_, _) =>
         {
             _startupItem.Checked = !_startupItem.Checked;
             StartupToggleRequested?.Invoke(_startupItem.Checked);
         };
-
-        var searchItem = new Forms.ToolStripMenuItem("Search history…");
-        searchItem.Click += (_, _) => SearchHistoryRequested?.Invoke();
-
-        var updateItem = new Forms.ToolStripMenuItem("Check for updates");
-        updateItem.Click += (_, _) => CheckUpdateRequested?.Invoke();
 
         var quitItem = new Forms.ToolStripMenuItem("Quit");
         quitItem.Click += (_, _) => QuitRequested?.Invoke();
@@ -80,18 +90,17 @@ public sealed class TrayService : IDisposable
         _menu.Items.AddRange(new Forms.ToolStripItem[]
         {
             captureItem,
+            areaCaptureItem,
+            activeWinItem,
+            captureOcrItem,
             new Forms.ToolStripSeparator(),
-            openItem,
-            changeItem,
+            settingsItem,
+            updateItem,
             new Forms.ToolStripSeparator(),
-            _openLastItem,
-            _revealItem,
-            _copyPathItem,
-            searchItem,
+            openFolderItem,
             _historyItem,
             new Forms.ToolStripSeparator(),
             _startupItem,
-            updateItem,
             new Forms.ToolStripSeparator(),
             quitItem,
         });
@@ -161,6 +170,11 @@ public sealed class TrayService : IDisposable
         var clearItem = new Forms.ToolStripMenuItem("Clear history");
         clearItem.Click += (_, _) => ClearHistoryRequested?.Invoke();
         _historyItem.DropDownItems.Add(clearItem);
+
+        _historyItem.DropDownItems.Add(new Forms.ToolStripSeparator());
+        var searchItem = new Forms.ToolStripMenuItem("Search history…");
+        searchItem.Click += (_, _) => SearchHistoryRequested?.Invoke();
+        _historyItem.DropDownItems.Add(searchItem);
     }
 
     public void SetHistoryActionsEnabled(bool hasHistory)

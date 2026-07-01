@@ -18,6 +18,7 @@ public partial class App : System.Windows.Application
     private MainWindow? _widget;
     private HotkeyService? _hotkeys;
     private UpdateService? _updater;
+    private SettingsWindow? _settingsWindow;
 
     // Single-instance mutex
     private Mutex? _instanceMutex;
@@ -25,6 +26,10 @@ public partial class App : System.Windows.Application
     // Fullscreen detection timer
     private System.Windows.Threading.DispatcherTimer? _fullscreenTimer;
     private bool _isWidgetHiddenByFullscreen;
+
+    // External foreground window tracking (for active-window capture)
+    private IntPtr _lastExternalHwnd;
+    private System.Windows.Threading.DispatcherTimer? _foregroundTracker;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -36,12 +41,12 @@ public partial class App : System.Windows.Application
         if (!createdNew)
         {
             // Another instance is already running — bring it to the foreground
-            var existingHwnd = NativeMethods.FindWindow(null, "OpenSnap");
+            var existingHwnd = FindWindow(null, "OpenSnap");
             if (existingHwnd != IntPtr.Zero)
             {
-                NativeMethods.SetForegroundWindow(existingHwnd);
-                NativeMethods.ShowWindow(existingHwnd, NativeMethods.SW_RESTORE);
-                NativeMethods.FlashWindow(existingHwnd, true);
+                SetForegroundWindow(existingHwnd);
+                ShowWindow(existingHwnd, SW_RESTORE);
+                FlashWindow(existingHwnd, true);
             }
             Current.Shutdown();
             return;
@@ -68,8 +73,10 @@ public partial class App : System.Windows.Application
 
         _tray = new TrayService();
         _tray.CaptureRequested += () => DispatchCapture(CaptureMode.FullScreen);
+        _tray.AreaCaptureRequested += () => DispatchCapture(CaptureMode.AreaSelection);
+        _tray.ActiveWindowRequested += () => DispatchCapture(CaptureMode.ActiveWindow);
+        _tray.CaptureOcrRequested += () => DispatchCapture(CaptureMode.CaptureOcr);
         _tray.OpenFolderRequested += OnOpenFolder;
-        _tray.ChangeFolderRequested += OnChangeFolder;
         _tray.StartupToggleRequested += OnStartupToggle;
         _tray.OpenLastScreenshotRequested += OnOpenLastScreenshot;
         _tray.CopyFilePathRequested += OnCopyFilePath;
@@ -79,6 +86,7 @@ public partial class App : System.Windows.Application
         _tray.DeleteHistoryItemRequested += OnDeleteHistoryItem;
         _tray.ClearHistoryRequested += OnClearHistory;
         _tray.SearchHistoryRequested += OnSearchHistory;
+        _tray.SettingsRequested += OnOpenSettings;
         _tray.CheckUpdateRequested += OnCheckUpdate;
         _tray.UpdateNotificationClicked += OnUpdateNotificationClicked;
         _tray.QuitRequested += OnQuit;
@@ -109,6 +117,9 @@ public partial class App : System.Windows.Application
 
         // Auto-hide when fullscreen apps are active
         StartFullscreenMonitor();
+
+        // Track external foreground window for active-window capture
+        StartForegroundTracker();
 
         // Periodic tray health check (handles Explorer restart)
         StartTrayHealthCheck();
@@ -152,25 +163,55 @@ public partial class App : System.Windows.Application
             // (bounce, flash) survive the capture cycle.
             if (mode == CaptureMode.ActiveWindow)
             {
-                var restoreLeft = _widget!.Left;
-                var restoreTop  = _widget.Top;
-                var restoreTopmost = _widget.Topmost;
+                // Use pre-tracked external foreground window
+                var targetHwnd = _lastExternalHwnd;
 
-                _widget.Topmost = false;
-                _widget.Left = -32000;
-                _widget.Top = -32000;
-                await Task.Delay(50);
-                source = CaptureService.CaptureActiveWindow();
-                _widget.Topmost = restoreTopmost;
-                _widget.Left = restoreLeft;
-                _widget.Top = restoreTop;
+                if (targetHwnd == IntPtr.Zero)
+                {
+                    source = CaptureService.CaptureFullScreen();
+                }
+                else
+                {
+                    // Try DWM extended bounds first
+                    var dwmBounds = GetDwmBoundsForCapture(targetHwnd);
+                    if (dwmBounds.HasValue)
+                    {
+                        var vs = System.Windows.Forms.SystemInformation.VirtualScreen;
+                        var clamped = System.Drawing.Rectangle.Intersect(
+                            new System.Drawing.Rectangle(vs.Left, vs.Top, vs.Width, vs.Height),
+                            dwmBounds.Value);
+                        if (clamped.Width > 0 && clamped.Height > 0)
+                            source = CaptureService.CaptureArea(clamped.Left, clamped.Top, clamped.Width, clamped.Height);
+                        else
+                            source = CaptureService.CaptureFullScreen();
+                    }
+                    else
+                    {
+                        // Fallback to GetWindowRect
+                        if (CaptureService.GetWindowRect(targetHwnd, out int awLeft, out int awTop, out int awWidth, out int awHeight))
+                        {
+                            var vs = System.Windows.Forms.SystemInformation.VirtualScreen;
+                            var clamped = System.Drawing.Rectangle.Intersect(
+                                new System.Drawing.Rectangle(vs.Left, vs.Top, vs.Width, vs.Height),
+                                new System.Drawing.Rectangle(awLeft, awTop, awWidth, awHeight));
+                            if (clamped.Width > 0 && clamped.Height > 0)
+                                source = CaptureService.CaptureArea(clamped.Left, clamped.Top, clamped.Width, clamped.Height);
+                            else
+                                source = CaptureService.CaptureFullScreen();
+                        }
+                        else
+                        {
+                            source = CaptureService.CaptureFullScreen();
+                        }
+                    }
+                }
             }
             else
             {
                 source = mode switch
                 {
                     CaptureMode.AreaSelection => await CaptureAreaAsync(),
-                    _ => ScreenshotService.CaptureDesktop(),
+                    _ => CaptureService.CaptureFullScreen(),
                 };
             }
 
@@ -238,25 +279,98 @@ public partial class App : System.Windows.Application
         }
     }
 
-    private static Task<System.Windows.Media.Imaging.BitmapSource?> CaptureAreaAsync()
+    private static async Task<System.Windows.Media.Imaging.BitmapSource?> CaptureAreaAsync()
     {
+        // Pre-capture full desktop before showing overlay.
+        // This preserves the exact visible window z-order.
+        var vs = System.Windows.Forms.SystemInformation.VirtualScreen;
+        int vsLeft = vs.Left, vsTop = vs.Top, vsWidth = vs.Width, vsHeight = vs.Height;
+
+        BitmapSource fullDesktop;
+        try
+        {
+            fullDesktop = CaptureService.CaptureArea(vsLeft, vsTop, vsWidth, vsHeight);
+        }
+        catch
+        {
+            return null;
+        }
+
         var tcs = new TaskCompletionSource<System.Windows.Media.Imaging.BitmapSource?>();
         var overlay = new AreaSelectorWindow();
+
         overlay.SelectionCompleted = rect =>
         {
-            // Convert window-relative coords to screen-absolute coords
-            // (the overlay spans the virtual desktop starting at
-            //  VirtualScreenLeft/Top, and GetPosition() is
-            //  window-content-relative).
-            var source = CaptureService.CaptureArea(
-                (int)(overlay.Left + rect.X),
-                (int)(overlay.Top + rect.Y),
-                (int)rect.Width, (int)rect.Height);
-            tcs.TrySetResult(source);
+            try
+            {
+                // Get DPI scale from overlay
+                var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(overlay);
+                double scaleX = dpi.DpiScaleX;
+                double scaleY = dpi.DpiScaleY;
+
+                // Convert DIP coordinates to physical pixels
+                int dipX = (int)(overlay.Left + rect.X);
+                int dipY = (int)(overlay.Top + rect.Y);
+                int dipW = (int)rect.Width;
+                int dipH = (int)rect.Height;
+
+                int physX = (int)(dipX * scaleX);
+                int physY = (int)(dipY * scaleY);
+                int physW = (int)(dipW * scaleX);
+                int physH = (int)(dipH * scaleY);
+
+                if (physW > 5 && physH > 5)
+                {
+                    // Clamp to virtual screen bounds
+                    physX = Math.Max(vsLeft, Math.Min(physX, vsLeft + vsWidth - 1));
+                    physY = Math.Max(vsTop, Math.Min(physY, vsTop + vsHeight - 1));
+                    physW = Math.Min(physW, vsLeft + vsWidth - physX);
+                    physH = Math.Min(physH, vsTop + vsHeight - physY);
+
+                    // Crop from pre-captured desktop bitmap
+                    var cropped = new System.Windows.Media.Imaging.CroppedBitmap(
+                        fullDesktop,
+                        new System.Windows.Int32Rect(
+                            physX - vsLeft, physY - vsTop,
+                            physW, physH));
+
+                    tcs.TrySetResult(cropped);
+                }
+                else
+                {
+                    tcs.TrySetResult(null);
+                }
+
+                overlay.Close();
+            }
+            catch (Exception ex)
+            {
+                LogException("CaptureArea", ex);
+                // Fallback: direct capture
+                try
+                {
+                    var fallback = CaptureService.CaptureArea(
+                        (int)((overlay.Left + rect.X) * 1.0),
+                        (int)((overlay.Top + rect.Y) * 1.0),
+                        (int)rect.Width, (int)rect.Height);
+                    tcs.TrySetResult(fallback);
+                }
+                catch
+                {
+                    overlay.Close();
+                    tcs.TrySetResult(null);
+                }
+            }
         };
-        overlay.Closed += (_, _) => tcs.TrySetResult(null);
+
+        overlay.Closed += (_, _) =>
+        {
+            if (!tcs.Task.IsCompleted)
+                tcs.TrySetResult(null);
+        };
+
         overlay.Show();
-        return tcs.Task;
+        return await tcs.Task;
     }
 
     // ── Fullscreen auto-hide monitor ───────────────────────────────────
@@ -366,6 +480,60 @@ public partial class App : System.Windows.Application
                 }
             }, Dispatcher);
     }
+
+    // ── External foreground window tracker ────────────────────────────
+
+    /// <summary>
+    /// Every 250ms, poll GetForegroundWindow and save it if it's not
+    /// owned by OpenSnap. This gives us the last valid external window
+    /// for active-window capture without having to guess after our UI
+    /// has taken focus.
+    /// </summary>
+    private void StartForegroundTracker()
+    {
+        _foregroundTracker = new System.Windows.Threading.DispatcherTimer(
+            TimeSpan.FromMilliseconds(250),
+            System.Windows.Threading.DispatcherPriority.Background,
+            (_, _) =>
+            {
+                try
+                {
+                    var hWnd = GetForegroundWindow();
+                    if (hWnd != IntPtr.Zero && !CaptureService.IsOwnWindow(hWnd))
+                    {
+                        _lastExternalHwnd = hWnd;
+                    }
+                }
+                catch { /* best-effort */ }
+            }, Dispatcher);
+    }
+
+    // ── DWM extended frame bounds helper ─────────────────────────────
+
+    /// <summary>Get DWM extended frame bounds for a window, or null.</summary>
+    private static System.Drawing.Rectangle? GetDwmBoundsForCapture(IntPtr hWnd)
+    {
+        try
+        {
+            var rect = new RECT();
+            int hr = DwmGetWindowAttribute(hWnd, DWMWA_EXTENDED_FRAME_BOUNDS,
+                ref rect, Marshal.SizeOf<RECT>());
+            if (hr == 0 && rect.Right > rect.Left && rect.Bottom > rect.Top)
+                return new System.Drawing.Rectangle(
+                    rect.Left, rect.Top,
+                    rect.Right - rect.Left,
+                    rect.Bottom - rect.Top);
+        }
+        catch { }
+        return null;
+    }
+
+    // DWM constants/imports (used by both foreground tracker and capture)
+    private const int DWMWA_EXTENDED_FRAME_BOUNDS = 9;
+
+    [DllImport("dwmapi.dll", PreserveSig = true)]
+    private static extern int DwmGetWindowAttribute(IntPtr hwnd, int dwAttribute,
+        ref RECT pvAttribute, int cbAttribute);
 
     // ── Exception logging ───────────────────────────────────────────────
 
@@ -514,22 +682,47 @@ public partial class App : System.Windows.Application
     private void OnOpenSettings()
     {
         if (_settings == null) return;
-        var win = new SettingsWindow(_settings);
-        win.Owner = _widget;
-        win.VisualSettingsChanged += () => _widget?.ApplySettings();
-        win.ShowDialog();
 
-        _widget?.ApplySettings();
-
-        // Re-register hotkeys if settings changed
-        _hotkeys?.Unregister();
-        if (_hotkeys != null)
+        try
         {
-            _hotkeys.CaptureModifiers = (uint)_settings.HotkeyCaptureModifiers;
-            _hotkeys.CaptureKey = (uint)_settings.HotkeyCaptureKey;
-            _hotkeys.ActiveWindowModifiers = (uint)_settings.HotkeyActiveWinModifiers;
-            _hotkeys.ActiveWindowKey = (uint)_settings.HotkeyActiveWinKey;
-            _hotkeys.Register();
+            // If the settings window is already open, activate it
+            if (_settingsWindow != null)
+            {
+                if (_settingsWindow.WindowState == WindowState.Minimized)
+                    _settingsWindow.WindowState = WindowState.Normal;
+                _settingsWindow.Activate();
+                _settingsWindow.Focus();
+                return;
+            }
+
+            _settingsWindow = new SettingsWindow(_settings);
+            _settingsWindow.Closed += (_, _) => _settingsWindow = null;
+            _settingsWindow.VisualSettingsChanged += () => _widget?.ApplySettings();
+            _settingsWindow.Show();
+
+            // Re-register hotkeys when settings window closes
+            _settingsWindow.Closed += (_, _) =>
+            {
+                _hotkeys?.Unregister();
+                if (_hotkeys != null)
+                {
+                    _hotkeys.CaptureModifiers = (uint)_settings.HotkeyCaptureModifiers;
+                    _hotkeys.CaptureKey = (uint)_settings.HotkeyCaptureKey;
+                    _hotkeys.ActiveWindowModifiers = (uint)_settings.HotkeyActiveWinModifiers;
+                    _hotkeys.ActiveWindowKey = (uint)_settings.HotkeyActiveWinKey;
+                    _hotkeys.Register();
+                }
+                _widget?.ApplySettings();
+            };
+        }
+        catch (Exception ex)
+        {
+            LogException("OpenSettings", ex);
+            System.Windows.MessageBox.Show(
+                $"Failed to open Settings:\n{ex.Message}",
+                "OpenSnap — Error",
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Error);
         }
     }
 

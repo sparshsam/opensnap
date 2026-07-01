@@ -16,21 +16,12 @@
         MouseMove="OnMouseMove"
         MouseLeftButtonUp="OnMouseUp">
 
-    <!-- Semi-transparent dark overlay; selection rectangle cuts through -->
+    <!-- Semi-transparent dark overlay; selection rectangle only, no UI text -->
     <Canvas x:Name="Overlay">
-        <!-- Selection border (drawn during drag) -->
         <Rectangle x:Name="SelectionRect"
-                   Stroke="#4A9EFF"
-                   StrokeThickness="2"
-                   Fill="#304A9EFF"
+                   Stroke="#CCFFFFFF"
+                   StrokeThickness="1.5"
+                   Fill="Transparent"
                    Visibility="Collapsed" />
-
-        <!-- Size label -->
-        <TextBlock x:Name="SizeLabel"
-                   Foreground="White"
-                   FontSize="11"
-                   FontFamily="Segoe UI, sans-serif"
-                   Visibility="Collapsed"
-                   IsHitTestVisible="False" />
     </Canvas>
 </Window>

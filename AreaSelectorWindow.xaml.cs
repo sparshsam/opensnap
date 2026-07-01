@@ -62,12 +62,6 @@ public partial class AreaSelectorWindow : Window
         System.Windows.Controls.Canvas.SetTop(SelectionRect, y);
         SelectionRect.Width = w;
         SelectionRect.Height = h;
-
-        // Size label
-        SizeLabel.Text = $"{w} × {h}";
-        System.Windows.Controls.Canvas.SetLeft(SizeLabel, x + 4);
-        System.Windows.Controls.Canvas.SetTop(SizeLabel, y + 4);
-        SizeLabel.Visibility = Visibility.Visible;
     }
 
     private void OnMouseUp(object sender, MouseButtonEventArgs e)

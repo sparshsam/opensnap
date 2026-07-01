@@ -37,6 +37,7 @@ public partial class SettingsWindow : Window
     public SettingsWindow(AppSettings settings)
     {
         _settings = settings;
+        _suppressToggle = true; // Prevent ValueChanged handlers from firing during XAML parsing
         InitializeComponent();
         PopulateKeyCombos();
         PopulateLanguageCombo();

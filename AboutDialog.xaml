@@ -44,7 +44,7 @@
                             github.com/sparshsam/opensnap
                         </Hyperlink>
                     </TextBlock>
-                    <TextBlock Text="© Sparsh" FontSize="11" Foreground="#888" Margin="0,0,0,4" />
+                    <TextBlock Text="© Kovina" FontSize="11" Foreground="#888" Margin="0,0,0,4" />
                     <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="#888">
                         Licensed under the MIT License.
                     </TextBlock>

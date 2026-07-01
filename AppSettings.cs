@@ -95,6 +95,12 @@ public sealed class AppSettings
                 settings.SavePath = GetDefaultSavePath();
             }
 
+            // Clamp opacity to prevent near-invisible widget from old settings
+            if (settings.Opacity < 0.80)
+                settings.Opacity = 0.80;
+            if (settings.Opacity > 1.0)
+                settings.Opacity = 1.0;
+
             return settings;
         }
         catch

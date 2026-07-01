@@ -12,7 +12,8 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>OpenSnap</AssemblyName>
     <RootNamespace>OpenSnap</RootNamespace>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
+    <FileVersion>1.0.1.0</FileVersion>
     <Description>A minimal floating screenshot widget for Windows.</Description>
     <Authors>Sparsh</Authors>
     <Product>OpenSnap</Product>

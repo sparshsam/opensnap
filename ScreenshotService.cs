@@ -36,7 +36,7 @@ public static class ScreenshotService
         var encoder = new PngBitmapEncoder();
         encoder.Frames.Add(BitmapFrame.Create(source));
 
-        using var stream = File.OpenWrite(filePath);
+        using var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
         encoder.Save(stream);
     }
 
