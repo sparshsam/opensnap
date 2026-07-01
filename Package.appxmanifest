@@ -7,7 +7,7 @@
 
   <Identity Name="SparshSam.OpenSnap"
             Publisher="CN=E6186421-BF8A-47E0-A89C-0F513DFF91C0"
-            Version="1.0.0.0" />
+            Version="1.0.1.0" />
 
   <Properties>
     <DisplayName>OpenSnap</DisplayName>
