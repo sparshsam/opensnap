@@ -50,11 +50,12 @@ Requires Windows SDK (MakeAppx.exe). Output: `dist\OpenSnap-0.9.0.msix`
 1. Update version in `OpenShot.csproj`, `setup.iss`, `build-installer.bat`
 2. Commit and tag: `git tag v0.x.x && git push origin --tags`
 3. Build installer + MSIX on Windows
-4. Create GitHub release:
+4. Upload MSIX to **Microsoft Partner Center** and publish to Store
+5. Create GitHub release:
 
 ```bash
 gh release create v0.x.x --title "v0.x.x — Title" --notes-file RELEASE_NOTES.md
 gh release upload v0.x.x dist/OpenSnap-Setup-v0.x.x.exe
 ```
 
-5. Upload MSIX to Microsoft Partner Center
+> **Note:** The **Microsoft Store** is the recommended distribution channel. The standalone MSIX and EXE are provided for manual installation and testing — the MSIX is not code-signed. Always update the Store first, then upload standalone builds to GitHub Releases.

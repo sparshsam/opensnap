@@ -1,7 +1,12 @@
 # FAQ
 
 ## Do I need .NET installed?
-Yes, OpenSnap requires the .NET 8 Runtime. The installer does not bundle it. Download from [dotnet.microsoft.com](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
+**For Microsoft Store users:** No — the Store package includes everything needed.  
+**For MSIX / EXE users:** Yes, OpenSnap requires the .NET 8 Runtime. The installer does not bundle it. Download from [dotnet.microsoft.com](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
+
+## How do I install OpenSnap?
+The easiest way is from the **[Microsoft Store](https://apps.microsoft.com/detail/9NV4G1F09L41)** — one click, signed, and stays updated automatically.  
+You can also download the [standalone MSIX (unsigned)](https://github.com/sparshsam/opensnap/releases/latest) for sideloading or the [EXE installer](https://github.com/sparshsam/opensnap/releases/latest) for Inno Setup installation.
 
 ## Does it upload my screenshots anywhere?
 No. OpenSnap saves to your local Desktop and copies to your clipboard. No data leaves your computer.
@@ -22,10 +27,12 @@ Capture + OCR runs Windows built-in OCR engine. It works with any installed Wind
 Yes. Right-click → Settings → Global hotkeys. Choose modifier combinations and keys for full screen and active window capture.
 
 ## Why is the installer flagged by SmartScreen?
-The installer is not code-signed. Click "More info → Run anyway" to proceed. A signed version is planned for future releases.
+The **Microsoft Store** version is signed and won't trigger SmartScreen.  
+The standalone MSIX and EXE installers are not code-signed. If you see "Windows protected your PC", click **More info → Run anyway**. For a hassle-free experience, get OpenSnap from the [Microsoft Store](https://apps.microsoft.com/detail/9NV4G1F09L41).
 
 ## How do I uninstall?
 Go to Settings → Apps → Installed apps → OpenSnap → Uninstall. Or run the installer again and select Remove.
 
 ## How do I update?
-OpenSnap checks for updates on startup. You can also right-click the tray icon → Check for updates. The app will download and prompt you to install.
+**Microsoft Store version:** Updates are installed automatically through the Microsoft Store — no action needed.  
+**Standalone version:** OpenSnap checks for updates on startup. You can also right-click the tray icon → Check for updates. The app will download and prompt you to install.

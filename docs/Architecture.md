@@ -39,5 +39,6 @@ Persisted as JSON at `%APPDATA%\OpenSnap\settings.json`. Written immediately on 
 - `async void` for event handlers (fire-and-forget with exception handling)
 
 ## Packaging
+- **Microsoft Store**: Primary distribution channel. Signed MSIX with automatic updates.
 - **Inno Setup** (`setup.iss`): Per-user or per-machine install, silent support
-- **MSIX** (`package-msix.ps1`): Store submission, requires Windows SDK MakeAppx.exe
+- **MSIX** (`package-msix.ps1`): Standalone sideloading package (unsigned), requires Windows SDK MakeAppx.exe

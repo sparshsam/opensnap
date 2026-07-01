@@ -13,6 +13,9 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/stable-v1.0.0-007a3f?style=for-the-badge" alt="v1.0.0">
+  <a href="https://apps.microsoft.com/detail/9NV4G1F09L41">
+    <img src="https://img.shields.io/badge/microsoft%20store-0078D4?style=for-the-badge&logo=microsoft&logoColor=white" alt="Microsoft Store">
+  </a>
   <a href="https://github.com/sparshsam/opensnap/releases/latest">
     <img src="https://img.shields.io/badge/download-latest%20release-007a3f?style=for-the-badge&logo=github" alt="Download">
   </a>
@@ -83,6 +86,21 @@ Every screenshot tool is either bloated, buried in menus, or requires three clic
     </td>
   </tr>
 </table>
+
+<br>
+
+---
+
+<br>
+
+## ⭐ Get OpenSnap
+
+| Method | Notes |
+|---|---|
+| **[Microsoft Store](https://apps.microsoft.com/detail/9NV4G1F09L41)** (Recommended) | Seamless automatic updates through Microsoft Store. Signed, trusted, one-click install. |
+| [Download MSIX](https://github.com/sparshsam/opensnap/releases/latest) (Unsigned) | Standalone `.msix` package. Intended for manual sideloading or testing. Not code-signed — see [Troubleshooting](docs/Troubleshooting.md). |
+| [Download EXE Installer](https://github.com/sparshsam/opensnap/releases/latest) | Inno Setup installer. Per-user or per-machine install, silent install support. |
+| [GitHub Source Code](https://github.com/sparshsam/opensnap) | Build from source. Requires .NET 8 SDK and Windows 10/11. |
 
 <br>
 

@@ -12,7 +12,8 @@ If .NET 8 is not listed, download and install the runtime, then restart.
 
 ## "Windows protected your PC" (SmartScreen)
 
-Click **More info → Run anyway**. The installer is not code-signed yet — this is expected. A signed version is planned.
+If you're using the **Microsoft Store** version — this doesn't apply. The Store version is signed and trusted.  
+If you're using the **standalone MSIX or EXE** installer: click **More info → Run anyway**. The standalone installer is not code-signed — this is expected. For a hassle-free experience, get OpenSnap from the [Microsoft Store](https://apps.microsoft.com/detail/9NV4G1F09L41).
 
 ## OCR not working
 
