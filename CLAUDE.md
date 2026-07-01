@@ -8,10 +8,11 @@ C# WPF screenshot widget for Windows. `net8.0-windows10.0.19041.0`.
 
 ---
 
-## Current state — v1.0.0 release ready
+## Current state — v1.0.0 in certification pipeline
 
-The app is feature-complete for v1.0.0. The MSIX (`OpenSnap-0.9.5.msix`) is on the desktop
-ready for Partner Center upload. The Inno Setup installer is on the GitHub Release page.
+The app is feature-complete and published. v1.0.0 MSIX has been accepted by Microsoft
+Partner Center and is awaiting certification. The Inno Setup installer is on the
+GitHub Release page. Landing page live at **snap.kovina.org**.
 
 ### What's shipped this session
 
@@ -21,16 +22,16 @@ ready for Partner Center upload. The Inno Setup installer is on the GitHub Relea
 | **v0.8.0** | Post-capture quick actions popup (Copy/OCR/Paint/Reveal), project prefix `{prefix}`, sequential numbering `{seq}`, date subfolders, history pin/delete/clear, custom app path |
 | **v0.9.0** | Per-user/per-machine installer, silent install (/VERYSILENT), background update download + one-click install, changelog viewer, diagnostics page, log export, MSIX packaging config |
 | **v0.9.5** | Keyboard nav (arrows + Enter), screen reader labels (AutomationProperties), High Contrast mode, larger icons toggle, 5-language localization (EN/FR/DE/ES/JA), app icon + theme-aware README logo |
-| **v1.0.0 prep** | Issue templates, SECURITY.md, CODE_OF_CONDUCT.md, FAQ, troubleshooting guide, stable branch, premium README |
+| **v0.9.6** | Press animation, startup mutex, save-only mode, history search dialog, improved active-window detection |
+| **v0.9.9** | Dead code cleanup, benchmark instrumentation, logging review, single-instance enforcement |
+| **v1.0.0** | Stable release — GitHub release, annotated tag, signed MSIX in Partner Center, landing page at snap.kovina.org |
 
-### Remaining for v1.0.0 (needs Windows runtime)
+### Next steps (when certification clears)
 
-- [ ] Run QA checklist (docs/Testing.md) — no known crashes
-- [ ] Verify installer, uninstaller, startup, OCR, clipboard, multi-monitor, DPI
-- [ ] Tag v1.0.0 and create GitHub release
-- [ ] Upload MSIX to Partner Center
-- [ ] Add real screenshots to `assets/screenshots/`
-- [ ] Upload Inno Setup installer to release
+- [ ] Certification result from Microsoft Partner Center
+- [ ] Promote MSIX to available in Store
+- [ ] Upload Inno Setup installer to GitHub Release
+- [ ] Update landing page with Store badge/link
 
 ---
 
@@ -134,12 +135,13 @@ opensnap/
 ├── assets/branding/        # Logo SVGs, PNGs, brand assets
 ├── assets/screenshots/     # Product screenshots (add as needed)
 ├── docs/                   # Developer documentation
+├── docs/landing/           # Landing page (snap.kovina.org)
 ├── .github/ISSUE_TEMPLATE/ # Bug report + feature request templates
 ├── Resources/Lang/         # JSON translation files
 ├── *.xaml / *.cs           # WPF app source
 ├── *.ps1                   # Build and packaging scripts
 ├── setup.iss               # Inno Setup installer config
-├── README.md               # Premium landing page
+├── README.md               # GitHub README
 ├── CHANGELOG.md            # Full version history
 ├── CLAUDE.md               # AI project context (this file)
 ├── SECURITY.md             # Security policy
