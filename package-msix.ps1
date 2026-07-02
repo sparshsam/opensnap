@@ -38,32 +38,37 @@ if (!(Test-Path $inputPath)) {
     exit 1
 }
 
-# Copy pre-made MSIX assets from branding folder
+# Copy pre-generated MSIX assets from repo Assets folder
 $assetsDir = Join-Path $inputPath "Assets"
 New-Item -ItemType Directory -Path $assetsDir -Force | Out-Null
-$brandingDir = Join-Path $PSScriptRoot "assets\branding"
+$repoAssetsDir = Join-Path $PSScriptRoot "Assets"
 
-# Use real brand assets, fall back to generated ones
-$storeLogo = Join-Path $brandingDir "logo-50.png"
-if (Test-Path $storeLogo) {
-    Copy-Item $storeLogo (Join-Path $assetsDir "StoreLogo.png") -Force
-}
-
-# For Square44x44 and Square150x150, scale the 50px logo if available
-$srcIcon = Join-Path $brandingDir "logo-white.png"
-if (Test-Path $srcIcon) {
-    Add-Type -AssemblyName System.Drawing
-    foreach ($size in @(44, 150)) {
-        $bmp = [System.Drawing.Image]::FromFile($srcIcon)
-        $resized = New-Object System.Drawing.Bitmap($size, $size)
-        $g = [System.Drawing.Graphics]::FromImage($resized)
-        $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
-        $g.DrawImage($bmp, 0, 0, $size, $size)
-        $g.Dispose()
-        $name = "Square${size}x${size}Logo.png"
-        $resized.Save((Join-Path $assetsDir $name), [System.Drawing.Imaging.ImageFormat]::Png)
-        $resized.Dispose()
-        $bmp.Dispose()
+if (Test-Path $repoAssetsDir) {
+    Get-ChildItem "$repoAssetsDir\*" -File | Copy-Item -Destination $assetsDir -Force
+    Write-Host "Copied $((Get-ChildItem $repoAssetsDir).Count) pre-generated MSIX assets"
+} else {
+    Write-Warning "No Assets directory found in repo. Using fallback generation..."
+    # Fallback: use branding assets with scaling (low quality)
+    $brandingDir = Join-Path $PSScriptRoot "assets\branding"
+    $storeLogo = Join-Path $brandingDir "logo-50.png"
+    if (Test-Path $storeLogo) {
+        Copy-Item $storeLogo (Join-Path $assetsDir "StoreLogo.png") -Force
+    }
+    $srcIcon = Join-Path $brandingDir "logo-white.png"
+    if (Test-Path $srcIcon) {
+        Add-Type -AssemblyName System.Drawing
+        foreach ($size in @(44, 150)) {
+            $bmp = [System.Drawing.Image]::FromFile($srcIcon)
+            $resized = New-Object System.Drawing.Bitmap($size, $size)
+            $g = [System.Drawing.Graphics]::FromImage($resized)
+            $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+            $g.DrawImage($bmp, 0, 0, $size, $size)
+            $g.Dispose()
+            $name = "Square${size}x${size}Logo.png"
+            $resized.Save((Join-Path $assetsDir $name), [System.Drawing.Imaging.ImageFormat]::Png)
+            $resized.Dispose()
+            $bmp.Dispose()
+        }
     }
 }
 
