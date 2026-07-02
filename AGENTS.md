@@ -5,6 +5,19 @@
 **Latest tag:** v1.0.1
 **Landing page:** https://snap.kovina.org
 
+## Branding Architecture
+
+OpenSnap is part of the Kovina ecosystem and the Open Product Family:
+
+```
+KOVINA → OPEN → Snap
+```
+
+- The header/logo lockup is `[icon] OPEN / Snap` (stacked, camera icon on left).
+- **OPEN has no icon.** Typography only.
+- The full name "OpenSnap" remains in window titles, tray, code, and README.
+- Always follow branding rules in `CLAUDE.md` and [`docs/BRANDING.md`](docs/BRANDING.md).
+
 ## Current version — v1.0.1
 
 v1.0.1 replaces v1.0.0 with proper MSIX visual assets and self-contained

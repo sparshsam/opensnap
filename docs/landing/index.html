@@ -70,6 +70,16 @@
       font-size: 17px; font-weight: 600;
     }
     .logo svg { display: block; }
+    .logo-lockup { display: flex; flex-direction: column; line-height: 1.2; }
+    .logo-open {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--text-muted); opacity: 0.5;
+    }
+    .logo-product {
+      font-size: 14px; font-weight: 500;
+      color: var(--text); margin-top: -2px;
+    }
     .nav-group { display: flex; align-items: center; gap: 6px; }
 
     /* ── Theme Toggle ─────────────────────────────────────────────── */
@@ -226,14 +236,19 @@
   <!-- ════════════════════ HEADER ════════════════════ -->
   <header>
     <div class="container inner">
-      <a href="#home" class="logo">
-        <svg width="22" height="22" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <a href="#home" class="logo" aria-label="OpenSnap home">
+        <!-- Camera icon for OpenSnap -->
+        <svg width="28" height="28" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0;">
           <path d="M33.08 30.05a1.23 1.23 0 0 1-1.24 1.23H17.16a1.23 1.23 0 0 1-1.24-1.23V20.25a1.23 1.23 0 0 1 1.24-1.23h4.42l.82-1.23a.7.7 0 0 1 .13-.07h3.96a.7.7 0 0 1 .12.07l.83 1.23h4.42a1.23 1.23 0 0 1 1.24 1.23v9.8Zm-1.24-12.23h-3.78l-.47-.7a1.2 1.2 0 0 0-1.12-.6h-3.96a1.2 1.2 0 0 0-1.12.6l-.46.7h-3.78a2.44 2.44 0 0 0-2.44 2.44v9.8a2.44 2.44 0 0 0 2.44 2.43h14.69a2.44 2.44 0 0 0 2.43-2.44V20.25a2.44 2.44 0 0 0-2.43-2.44Z" fill="currentColor"/>
           <circle cx="24.5" cy="25.15" r="4.11" fill="currentColor"/>
           <circle cx="24.5" cy="25.15" r="2.88" fill="none" stroke="currentColor" stroke-width="1.5"/>
           <circle cx="18.17" cy="20.97" r="1.03" fill="currentColor"/>
         </svg>
-        OpenSnap
+        <!-- Stacked lockup: OPEN above Snap -->
+        <span class="logo-lockup">
+          <span class="logo-open">OPEN</span>
+          <span class="logo-product">Snap</span>
+        </span>
       </a>
       <div class="nav-group">
         <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">

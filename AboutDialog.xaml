@@ -17,15 +17,20 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Header -->
+        <!-- Header lockup: [Camera Icon] OPEN / Snap -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+            <!-- Camera icon for OpenSnap -->
             <Viewbox Width="28" Height="28" Stretch="Uniform" Margin="0,0,10,0" VerticalAlignment="Center">
                 <Path Fill="#4A9EFF"
                       Data="M12,3.5 L14.5,3.5 L16,6.5 L20,6.5 C21.1,6.5 22,7.4 22,8.5 L22,18.5 C22,19.6 21.1,20.5 20,20.5 L4,20.5 C2.9,20.5 2,19.6 2,18.5 L2,8.5 C2,7.4 2.9,6.5 4,6.5 L8,6.5 L9.5,3.5 Z M12,9.5 C9.8,9.5 8,11.3 8,13.5 C8,15.7 9.8,17.5 12,17.5 C14.2,17.5 16,15.7 16,13.5 C16,11.3 14.2,9.5 12,9.5 Z" />
             </Viewbox>
-            <StackPanel>
-                <TextBlock Text="OpenSnap" FontSize="16" FontWeight="SemiBold" />
-                <TextBlock x:Name="VersionText" FontSize="12" Foreground="#888" />
+            <!-- Stacked lockup: OPEN above Snap -->
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="OPEN" FontSize="10" FontWeight="Bold" Foreground="#888"
+                           LetterSpacing="6" CharacterSpacing="60" />
+                <TextBlock Text="Snap" FontSize="16" FontWeight="Medium" Foreground="#F0F0F0"
+                           Margin="0,-2,0,0" />
+                <TextBlock x:Name="VersionText" FontSize="12" Foreground="#888" Margin="0,2,0,0" />
                 <TextBlock x:Name="UpdateStatusText" FontSize="11" Foreground="#4A9EFF" />
             </StackPanel>
         </StackPanel>

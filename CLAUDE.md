@@ -36,6 +36,37 @@ Landing page at **snap.kovina.org**.
 
 ---
 
+## Branding Architecture
+
+OpenSnap is part of the Kovina ecosystem and the Open Product Family. **Never redesign branding without explicit instruction.**
+
+### Hierarchy
+
+```
+KOVINA          Parent ecosystem     → kovina.org/standards/KOVINA_MANIFESTO.md
+  ↓
+OPEN            Product family       → kovina.org/standards/BRAND_GUIDELINES.md
+  ↓
+Snap            Individual product   → docs/BRANDING.md
+```
+
+### Key Rules
+
+- **OPEN has no icon.** No symbol, no badge, no monogram. Typography only.
+- The application icon (camera motif) belongs only to OpenSnap, never to OPEN.
+- Do not merge the icon into the typography lockup.
+- Do not create a combined logo mark.
+- The header lockup is: `[icon] OPEN / Snap` (stacked, icon on left).
+- The full name "OpenSnap" remains in window titles, system tray, code, README, and landing page meta references.
+- Never redesign the header lockup without explicit instruction.
+- Kovina standards are authoritative. OpenSnap inherits them.
+- Always follow Kovina standards first, then product-specific rules.
+- OpenPalette is the canonical reference implementation for the Open Product Family branding.
+
+See [docs/BRANDING.md](docs/BRANDING.md) for complete product-specific branding documentation.
+
+---
+
 ## Key files
 
 | File | Purpose |
