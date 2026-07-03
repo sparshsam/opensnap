@@ -2,7 +2,7 @@
 
 **Project:** C# WPF screenshot widget for Windows (.NET 8)
 **GitHub:** https://github.com/sparshsam/opensnap
-**Latest tag:** v1.0.1
+**Latest tag:** v1.0.2
 **Landing page:** https://snap.kovina.org
 
 ## Branding Architecture
@@ -18,11 +18,19 @@ KOVINA → OPEN → Snap
 - The full name "OpenSnap" remains in window titles, tray, code, and README.
 - Always follow branding rules in `CLAUDE.md` and [`docs/BRANDING.md`](docs/BRANDING.md).
 
-## Current version — v1.0.1
+## Current version — v1.0.2
 
-v1.0.1 replaces v1.0.0 with proper MSIX visual assets and self-contained
-packaging. The MSIX (`OpenSnap-1.0.1.msix`, 74.88 MB) is on the user's Desktop
-ready for Partner Center upload.
+v1.0.2 aligns the app and landing page with Open Product Family branding
+standards (Kovina → OPEN → Snap hierarchy). Full branding documentation at
+[`docs/BRANDING.md`](docs/BRANDING.md).
+
+- About dialog and landing page header: `[camera icon] OPEN / Snap` stacked lockup
+- Created `docs/BRANDING.md` with Kovina → OPEN → Snap hierarchy and brand rules
+- Added landing page favicons (favicon.ico, favicon-16/32, apple-touch-icon)
+- Replaced inline header SVG with official PNG from WindowsAssets/CompositeLight
+- Added dark/light themed header icons with CSS transition
+- Icon size increased to 36/40px for visual balance with typography
+- Lockup CSS aligned to canonical OpenPalette spec
 
 ## Visual assets architecture
 

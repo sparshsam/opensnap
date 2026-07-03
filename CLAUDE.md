@@ -3,15 +3,15 @@
 C# WPF screenshot widget for Windows. `net8.0-windows10.0.19041.0`.
 
 **GitHub:** https://github.com/sparshsam/opensnap
-**Latest tag:** v1.0.1
+**Latest tag:** v1.0.2
 **Stable branch:** `stable`
 
 ---
 
-## Current state — v1.0.1 in certification pipeline
+## Current state — v1.0.2
 
-The app is feature-complete. v1.0.1 MSIX replaces the previous v1.0.0 submission
-with proper high-quality visual assets and self-contained .NET runtime packaging.
+v1.0.2 aligns the app and landing page with Open Product Family branding
+standards. Full branding documentation at **docs/BRANDING.md**.
 Landing page at **snap.kovina.org**.
 
 ### What's shipped this session
@@ -26,12 +26,11 @@ Landing page at **snap.kovina.org**.
 | **v0.9.9** | Dead code cleanup, benchmark instrumentation, logging review, single-instance enforcement |
 | **v1.0.0** | Stable release — GitHub release, annotated tag, signed MSIX in Partner Center, landing page at snap.kovina.org |
 | **v1.0.1** | All MSIX visual assets regenerated from 1024×1024 masters (opensnap_dark_mode.png / opensnap_light_mode.png) using Pillow LANCZOS. 66 assets across 11 logo types × 6 scale variants (scale-100/125/150/200/400) plus SplashScreen and 6-size app.ico. Updated Package.appxmanifest with DefaultTile (Wide310x150, Square71x71, Square310x310) and SplashScreen. Built self-contained win-x64 MSIX (74.88 MB). |
+| **v1.0.2** | Open Product Family branding alignment. About dialog and landing page header updated to `[camera icon] OPEN / Snap` stacked lockup. Created `docs/BRANDING.md` with Kovina → OPEN → Snap hierarchy and brand rules. Added landing page favicons (favicon.ico, favicon-16/32, apple-touch-icon). Replaced inline header SVG with official PNG from WindowsAssets/CompositeLight (120px Lanczos from Square44x44Logo.scale-400). Added dark/light themed header icons with CSS transition. Icon size increased to 36/40px. Lockup CSS aligned to canonical OpenPalette spec. |
 
 ### Next steps
 
-- [ ] Submit OpenSnap-1.0.1.msix to Microsoft Partner Center
-- [ ] Promote MSIX to available in Store
-- [ ] Upload Inno Setup installer to GitHub Release
+- [ ] Push v1.0.2 tag and GitHub Release
 - [ ] Update landing page with Store badge/link
 
 ---
