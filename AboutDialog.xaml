@@ -26,8 +26,7 @@
             </Viewbox>
             <!-- Stacked lockup: OPEN above Snap -->
             <StackPanel VerticalAlignment="Center">
-                <TextBlock Text="OPEN" FontSize="10" FontWeight="Bold" Foreground="#888"
-                           LetterSpacing="6" CharacterSpacing="60" />
+                <TextBlock Text="OPEN" FontSize="10" FontWeight="Bold" Foreground="#888" />
                 <TextBlock Text="Snap" FontSize="16" FontWeight="Medium" Foreground="#F0F0F0"
                            Margin="0,-2,0,0" />
                 <TextBlock x:Name="VersionText" FontSize="12" Foreground="#888" Margin="0,2,0,0" />
