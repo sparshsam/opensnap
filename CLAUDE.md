@@ -8,7 +8,7 @@ C# WPF screenshot widget for Windows. `net8.0-windows10.0.19041.0`.
 
 ---
 
-## Current state — v1.0.2
+## Current state — 2026-07-03 — v1.0.2
 
 v1.0.2 aligns the app and landing page with Open Product Family branding
 standards. Full branding documentation at **docs/BRANDING.md**.
@@ -26,7 +26,35 @@ Landing page at **snap.kovina.org**.
 | **v0.9.9** | Dead code cleanup, benchmark instrumentation, logging review, single-instance enforcement |
 | **v1.0.0** | Stable release — GitHub release, annotated tag, signed MSIX in Partner Center, landing page at snap.kovina.org |
 | **v1.0.1** | All MSIX visual assets regenerated from 1024×1024 masters (opensnap_dark_mode.png / opensnap_light_mode.png) using Pillow LANCZOS. 66 assets across 11 logo types × 6 scale variants (scale-100/125/150/200/400) plus SplashScreen and 6-size app.ico. Updated Package.appxmanifest with DefaultTile (Wide310x150, Square71x71, Square310x310) and SplashScreen. Built self-contained win-x64 MSIX (74.88 MB). |
-| **v1.0.2** | Open Product Family branding alignment. About dialog and landing page header updated to `[camera icon] OPEN / Snap` stacked lockup. Created `docs/BRANDING.md` with Kovina → OPEN → Snap hierarchy and brand rules. Added landing page favicons (favicon.ico, favicon-16/32, apple-touch-icon). Replaced inline header SVG with official PNG from WindowsAssets/CompositeLight (120px Lanczos from Square44x44Logo.scale-400). Added dark/light themed header icons with CSS transition. Icon size increased to 36/40px. Lockup CSS aligned to canonical OpenPalette spec. |
+| **v1.0.2** | 2026-07-03 — Branding & MSIX polish. Open Product Family alignment: `[camera icon] OPEN / Snap` stacked lockup in About dialog and landing page header. Created `docs/BRANDING.md` with Kovina → OPEN → Snap hierarchy and brand rules. OpenPalette canonical spec alignment. Landing page favicons (favicon.ico, favicon-16/32, apple-touch-icon). Header icon: replaced inline SVG with official PNG from WindowsAssets/CompositeLight (120px Lanczos from Square44x44Logo.scale-400). Dark header icon from WindowsAssets/Dark. Dual-image CSS transition with `[data-theme="dark"]` toggle. Icon size increased to 36/40px. WPF XAML fix: removed invalid LetterSpacing/CharacterSpacing from AboutDialog. 66 stale MSIX assets replaced with CompositeLight versions. MSIX built (OpenSnap-1.0.1.msix, self-contained, 74MB). All 3 tile asset SHA-256 hashes verified against WindowsAssets source. MSIX copied to desktop. Landing page: eslint-disable comments added for header img tags, fixed missing imports in app-shell.tsx. |
+
+#### v1.0.2 change detail
+
+**Branding**
+- About dialog: `[camera icon] OPEN / Snap` stacked lockup
+- Landing page header: `[camera icon] OPEN / Snap` lockup
+- Created `docs/BRANDING.md` with Kovina → OPEN → Snap hierarchy
+- OpenPalette canonical spec alignment
+
+**Icons**
+- Landing page favicons added (favicon.ico, favicon-16/32, apple-touch-icon)
+- Header icon: replaced inline SVG with official PNG from WindowsAssets/CompositeLight (120px Lanczos from Square44x44Logo.scale-400)
+- Dark header icon: from WindowsAssets/Dark
+- Icon size increased to 36/40px for visual balance
+
+**Dark/Light Theme**
+- Dual-image CSS transition with `[data-theme="dark"]` toggle
+
+**MSIX Build**
+- 66 stale MSIX assets replaced with properly generated CompositeLight versions
+- WPF XAML fix: removed invalid LetterSpacing/CharacterSpacing properties from AboutDialog
+- MSIX built: OpenSnap-1.0.1.msix (self-contained, 74MB)
+- Verified: all 3 tile asset SHA-256 hashes match WindowsAssets source
+- MSIX copied to desktop
+
+**WPF App**
+- Added eslint-disable comments for header img tags
+- Fixed missing imports in app-shell.tsx
 
 ### Next steps
 
