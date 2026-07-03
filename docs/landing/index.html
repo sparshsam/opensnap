@@ -73,8 +73,15 @@
       text-decoration: none; color: var(--text);
       font-size: 17px; font-weight: 600;
     }
-    .logo .logo-icon { display: block; width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; }
-    @media (min-width: 768px) { .logo .logo-icon { width: 40px; height: 40px; } }
+    .logo .logo-icon-wrap { position: relative; display: block; width: 36px; height: 36px; flex-shrink: 0; }
+    @media (min-width: 768px) { .logo .logo-icon-wrap { width: 40px; height: 40px; } }
+    .logo .logo-icon-light,
+    .logo .logo-icon-dark { position: absolute; top: 0; left: 0; width: 36px; height: 36px; border-radius: 8px; transition: opacity 0.3s ease; }
+    @media (min-width: 768px) { .logo .logo-icon-light, .logo .logo-icon-dark { width: 40px; height: 40px; } }
+    .logo .logo-icon-light { opacity: 1; }
+    .logo .logo-icon-dark { opacity: 0; }
+    [data-theme="dark"] .logo .logo-icon-light { opacity: 0; }
+    [data-theme="dark"] .logo .logo-icon-dark { opacity: 1; }
     .logo-lockup { display: flex; flex-direction: column; line-height: 1.25; }
     .logo-open {
       font-size: 10px; font-weight: 700;
@@ -243,7 +250,10 @@
     <div class="container inner">
       <a href="#home" class="logo" aria-label="OpenSnap home">
         <!-- Camera icon for OpenSnap -->
-        <img src="/opensnap-icon-header.png" alt="" class="logo-icon" />
+        <span class="logo-icon-wrap">
+          <img src="/opensnap-icon-header.png" alt="" class="logo-icon-light" />
+          <img src="/opensnap-icon-header-dark.png" alt="" class="logo-icon-dark" />
+        </span>
         <!-- Stacked lockup: OPEN above Snap -->
         <span class="logo-lockup">
           <span class="logo-open">OPEN</span>
