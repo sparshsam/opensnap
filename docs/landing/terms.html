@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — OpenSnap</title>
+  <meta name="description" content="OpenSnap terms of service — free, open-source screenshot software.">
+  <link rel="canonical" href="https://snap.kovina.org/terms">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png" />
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      display: flex; flex-direction: column; min-height: 100vh;
+    }
+    main { flex: 1; }
+    :root {
+      --bg: #f9f9f9;
+      --text: #1a1a1a;
+      --text-secondary: #6b6b6b;
+      --text-muted: #9a9a9a;
+      --divider: #e5e5e5;
+      --surface-muted: #f0f0f0;
+      --btn-bg: #0d0d0d;
+      --btn-text: #ffffff;
+      --btn-hover: #333333;
+    }
+    [data-theme="dark"] {
+      --bg: #0d0d0d;
+      --text: #ededed;
+      --text-secondary: #8a8a8a;
+      --text-muted: #5c5c5c;
+      --divider: #1f1f1f;
+      --surface-muted: #161616;
+      --btn-bg: #ffffff;
+      --btn-text: #0d0d0d;
+      --btn-hover: #cccccc;
+    }
+    body { background: var(--bg); color: var(--text); }
+    h1, h2, h3 { font-weight: 700; line-height: 1.2; }
+    p { color: var(--text-secondary); }
+    .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+
+    header {
+      position: sticky; top: 0; z-index: 50;
+      background: var(--bg);
+      transition: background-color 0.3s ease;
+      border-bottom: 1px solid var(--divider);
+    }
+    header .inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px; max-width: 1040px; margin: 0 auto; padding: 0 24px;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 6px;
+      text-decoration: none; color: var(--text);
+      font-size: 17px; font-weight: 600;
+    }
+    .logo img { width: 24px; height: 24px; border-radius: 4px; }
+    .logo .slash { color: var(--text-muted); font-weight: 300; margin: 0 2px; }
+    .logo .product { font-weight: 700; }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-links a {
+      padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500;
+      color: var(--text-secondary); text-decoration: none; transition: background 0.2s, color 0.2s;
+    }
+    .nav-links a:hover { background: var(--surface-muted); color: var(--text); }
+
+    .page { padding: 64px 24px 80px; max-width: 720px; margin: 0 auto; }
+    h1 { font-size: 36px; margin-bottom: 8px; }
+    .updated { font-size: 14px; color: var(--text-muted); margin-bottom: 40px; }
+    h2 { font-size: 20px; margin-top: 32px; margin-bottom: 8px; color: var(--text); }
+    p { font-size: 15px; margin-bottom: 14px; color: var(--text-secondary); }
+    ul { margin: 0 0 14px 20px; }
+    ul li { font-size: 15px; color: var(--text-secondary); margin-bottom: 6px; }
+    a { color: var(--text); text-decoration: underline; }
+    a:hover { opacity: 0.7; }
+
+    footer { padding: 32px 24px; max-width: 1040px; margin: 0 auto; width: 100%; }
+    footer hr { border: none; border-top: 1px solid var(--divider); margin-bottom: 24px; }
+    footer .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    footer .links { display: flex; gap: 20px; }
+    footer .links a { font-size: 14px; color: var(--text-muted); text-decoration: none; }
+    footer .links a:hover { color: var(--text); opacity: 1; }
+    footer .kovina { font-size: 14px; color: var(--text-muted); text-decoration: none; }
+    footer .kovina:hover { color: var(--text); opacity: 1; }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 28px; }
+      .page { padding: 40px 20px 60px; }
+      footer .footer-inner { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="inner">
+      <a href="/" class="logo">
+        <img src="/opensnap-icon-header.png" alt="" />
+        <span class="slash">/</span>
+        <span class="product">Snap</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/#about">About</a>
+        <a href="https://github.com/sparshsam/opensnap" target="_blank">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="page">
+      <h1>Terms of Service</h1>
+      <p class="updated">Last updated: July 4, 2026</p>
+
+      <section>
+        <h2>Acceptance of Terms</h2>
+        <p>By using OpenSnap, you agree to these terms. If you do not agree, do not use the application.</p>
+      </section>
+
+      <section>
+        <h2>License</h2>
+        <p>OpenSnap is free, open-source software released under the <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer">MIT License</a>. You may use, modify, and distribute it under the terms of that license.</p>
+      </section>
+
+      <section>
+        <h2>No Warranty</h2>
+        <p>OpenSnap is provided "as is" without warranty of any kind, express or implied. The authors are not liable for any damages arising from its use. You use the software at your own risk.</p>
+      </section>
+
+      <section>
+        <h2>Data Responsibility</h2>
+        <p>You are responsible for maintaining backups of your screenshots. OpenSnap saves files to your chosen location, but this is a convenience feature, not a guarantee. The authors are not responsible for data loss resulting from file system errors, failed backups, or user error.</p>
+      </section>
+
+      <section>
+        <h2>Service Availability</h2>
+        <p>OpenSnap runs entirely on your device. No internet connection is required. There is no hosted service to go down. The application is self-contained and does not depend on external infrastructure for core functionality. The optional update check contacts GitHub's public API but is not required for the application to function.</p>
+      </section>
+
+      <section>
+        <h2>User Conduct</h2>
+        <p>You agree not to use OpenSnap for any unlawful purpose or in violation of any applicable laws or regulations.</p>
+      </section>
+
+      <section>
+        <h2>Changes to Terms</h2>
+        <p>These terms may be updated from time to time. Continued use after changes constitutes acceptance of the revised terms. Material changes will be noted by updating the "Last updated" date.</p>
+      </section>
+
+      <section>
+        <h2>Contact</h2>
+        <p>For questions about these terms, email <a href="mailto:sparshsam@gmail.com">sparshsam@gmail.com</a>.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <hr>
+    <div class="footer-inner">
+      <div class="links">
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="/#about">About</a>
+        <a href="https://github.com/sparshsam/opensnap" target="_blank">GitHub</a>
+      </div>
+      <a href="https://kovina.org" class="kovina">Kovina</a>
+    </div>
+  </footer>
+
+  <script>
+    (function initTheme() {
+      const saved = localStorage.getItem('theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+</body>
+</html>

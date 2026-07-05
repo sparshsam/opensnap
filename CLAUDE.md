@@ -12,7 +12,36 @@ C# WPF screenshot widget for Windows. `net8.0-windows10.0.19041.0`.
 
 v1.0.2 aligns the app and landing page with Open Product Family branding
 standards. Full branding documentation at **docs/BRANDING.md**.
-Landing page at **snap.kovina.org**.
+## Landing page
+
+- **Source:** `docs/landing/` — static HTML, Inter font, dark/light theme toggle.
+- **Pages:** `index.html` (home), `privacy.html` (Privacy Policy), `terms.html` (Terms of Service).
+- **Footer:** All pages link to `/privacy`, `/terms`, About, GitHub.
+- **Privacy & Legal:** See section below.
+- Deployed on Cloudflare Pages at **snap.kovina.org**.
+
+## Privacy & Legal Pages
+
+The website at **snap.kovina.org** has dedicated legal pages:
+
+| Page | Path | Last Updated |
+|------|------|-------------|
+| Privacy Policy | `docs/landing/privacy.html` → `/privacy` | July 4, 2026 |
+| Terms of Service | `docs/landing/terms.html` → `/terms` | July 4, 2026 |
+
+Both pages follow the standardised Kovina Privacy & Terms template. Key OpenSnap-specific customisations:
+
+- **No cloud / no backup provider** — OpenSnap is 100% offline.
+- **License** — MIT (not AGPL), noted in Terms.
+- **Third-party services** — Lists Cloudflare (hosting), Microsoft Store, and GitHub (distribution) with privacy policy links.
+- **Advice disclaimer** — Omitted (screenshot tool, no advice category needed).
+- **Data deletion** — All local; screenshots on file system, settings in `%APPDATA%`.
+- Footer on all three site pages includes Privacy + Terms + About + GitHub links.
+- Old inline `#terms` and `#privacy` hash-anchored sections removed from `index.html`.
+
+### Update checklist
+- When legal content changes, update `docs/landing/privacy.html` and `docs/landing/terms.html`.
+- The "Last updated" date must be updated on every material change.
 
 ### What's shipped this session
 

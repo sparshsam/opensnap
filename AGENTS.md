@@ -4,6 +4,8 @@
 **GitHub:** https://github.com/sparshsam/opensnap
 **Latest tag:** v1.0.2
 **Landing page:** https://snap.kovina.org
+**Landing page source:** `docs/landing/` — `index.html`, `privacy.html`, `terms.html`.
+**Privacy & Legal:** See `CLAUDE.md` → "Privacy & Legal Pages" for full reference.
 
 ## Branding Architecture
 
