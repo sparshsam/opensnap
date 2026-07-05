@@ -1,4 +1,0 @@
-# Cloudflare Pages redirects
-# Serve clean URLs for legal pages
-/privacy /privacy.html 200
-/terms /terms.html 200
