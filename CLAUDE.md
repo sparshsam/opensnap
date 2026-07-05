@@ -16,6 +16,7 @@ standards. Full branding documentation at **docs/BRANDING.md**.
 
 - **Source:** `docs/landing/` — static HTML, Inter font, dark/light theme toggle.
 - **Pages:** `index.html` (home), `privacy.html` (Privacy Policy), `terms.html` (Terms of Service).
+- **Routing:** `_redirects` file maps `/privacy` → `privacy.html` and `/terms` → `terms.html` for clean URLs.
 - **Footer:** All pages link to `/privacy`, `/terms`, About, GitHub.
 - **Privacy & Legal:** See section below.
 - Deployed on Cloudflare Pages at **snap.kovina.org**.
