@@ -8,9 +8,11 @@ C# WPF screenshot widget for Windows. `net8.0-windows10.0.19041.0`.
 
 ---
 
-## Current state — 2026-07-03 — v1.0.2
+## Current state — 2026-07-06 — v1.0.3 (MSIX certification fix)
 
-v1.0.2 aligns the app and landing page with Open Product Family branding
+v1.0.3 fixes the Windows App Certification Kit (WACK) failure on rule
+10.1.1.11 "On Device Tiles" by correcting tile image rounding and adding
+required AppList.targetsize assets. Full branding docs at **docs/BRANDING.md**
 standards. Full branding documentation at **docs/BRANDING.md**.
 ## Landing page
 
@@ -56,6 +58,8 @@ Both pages follow the standardised Kovina Privacy & Terms template. Key OpenSnap
 | **v1.0.0** | Stable release — GitHub release, annotated tag, signed MSIX in Partner Center, landing page at snap.kovina.org |
 | **v1.0.1** | All MSIX visual assets regenerated from 1024×1024 masters (opensnap_dark_mode.png / opensnap_light_mode.png) using Pillow LANCZOS. 66 assets across 11 logo types × 6 scale variants (scale-100/125/150/200/400) plus SplashScreen and 6-size app.ico. Updated Package.appxmanifest with DefaultTile (Wide310x150, Square71x71, Square310x310) and SplashScreen. Built self-contained win-x64 MSIX (74.88 MB). |
 | **v1.0.2** | 2026-07-03 — Branding & MSIX polish. Open Product Family alignment: `[camera icon] OPEN / Snap` stacked lockup in About dialog and landing page header. Created `docs/BRANDING.md` with Kovina → OPEN → Snap hierarchy and brand rules. OpenPalette canonical spec alignment. Landing page favicons (favicon.ico, favicon-16/32, apple-touch-icon). Header icon: replaced inline SVG with official PNG from WindowsAssets/CompositeLight (120px Lanczos from Square44x44Logo.scale-400). Dark header icon from WindowsAssets/Dark. Dual-image CSS transition with `[data-theme="dark"]` toggle. Icon size increased to 36/40px. WPF XAML fix: removed invalid LetterSpacing/CharacterSpacing from AboutDialog. 66 stale MSIX assets replaced with CompositeLight versions. MSIX built (OpenSnap-1.0.1.msix, self-contained, 74MB). All 3 tile asset SHA-256 hashes verified against WindowsAssets source. MSIX copied to desktop. Landing page: eslint-disable comments added for header img tags, fixed missing imports in app-shell.tsx. |
+| **v1.0.3** | **2026-07-06 — MSIX certification fix.** Fixed 7 tile rounding errors (ceil→floor) matching Microsoft exact pixel specs. Generated 42 AppList.targetsize assets (14 sizes × 3 themes) required by Microsoft app-icon-construction docs. Regenerated app.ico (9 frames, Pillow from 1024 master). Built self-contained win-x64 MSIX (74.6 MB). Created `scripts/regenerate-msix-assets.py`. Created `docs/msix-tile-verification-report.md`. Ready for Partner Center upload. |
+| `docs/msix-tile-verification-report.md` | Dimension verification against Microsoft official specs |
 
 #### v1.0.2 change detail
 
@@ -88,6 +92,7 @@ Both pages follow the standardised Kovina Privacy & Terms template. Key OpenSnap
 ### Next steps
 
 - [ ] Push v1.0.2 tag and GitHub Release
+- [ ] Upload OpenSnap-1.0.1.msix to Partner Center
 - [ ] Update landing page with Store badge/link
 
 ---
@@ -144,7 +149,9 @@ See [docs/BRANDING.md](docs/BRANDING.md) for complete product-specific branding 
 | `AboutDialog.xaml/.cs` | About / Changelog / Diagnostics tabs |
 | `setup.iss` | Inno Setup installer config |
 | `package-msix.ps1` | MSIX package builder (uses pre-generated Assets/) |
-| `Assets/*.png` | 66 pre-generated MSIX store assets (11 logos × 6 scale variants) |
+| `scripts/regenerate-msix-assets.py` | Pillow-based asset generator from 1024×1024 masters |
+| `docs/msix-tile-verification-report.md` | Dimension verification against Microsoft official specs |
+| `Assets/*.png` | 109 pre-generated MSIX store assets (66 tile images + 42 AppList.targetsize + app.ico) |
 | `Resources/Lang/*.json` | Translation files (en/fr/de/es/ja) |
 | `assets/branding/` | Brand assets (logos, screenshots) |
 
@@ -197,6 +204,8 @@ dotnet publish -c Release -r win-x64 --self-contained true -o msix-release   # S
 powershell -ExecutionPolicy Bypass -File C:\tmp\msix-pack.ps1 -Version 1.0.1
 build-installer.bat                # Inno Setup
 .\package-msix.ps1 -Version 1.0.1  # Legacy MSIX (uses release/)
+| `scripts/regenerate-msix-assets.py` | Pillow-based asset generator from 1024×1024 masters |
+| `docs/msix-tile-verification-report.md` | Dimension verification against Microsoft official specs |
 ```
 
 ## Visual assets
@@ -209,7 +218,7 @@ Regenerate all MSIX assets with:
 ```bash
 python3 "C:\Users\spars\OneDrive\Kovina\Apps Stuff\opensnap\generate_assets.py"
 ```
-Outputs 264 files (66 per theme × 4 themes) to `WindowsAssets/`. Copies composite
+Outputs 109 files to `WindowsAssets/` (66 tile images + 42 AppList.targetsize + app.ico)/`. Copies composite
 (transparent-bg, universal) set to repo `Assets/`.
 
 ## Release workflow
@@ -238,15 +247,16 @@ Then upload MSIX to Partner Center.
 
 ```
 opensnap/
-├── Assets/                 # 66 pre-generated MSIX store assets (composite set)
+├── Assets/                 # 109 pre-generated MSIX store assets (66 tiles + 42 targetsize + app.ico)
 ├── assets/branding/        # Logo SVGs, PNGs, brand assets (README use)
 ├── assets/screenshots/     # Product screenshots (add as needed)
 ├── docs/                   # Developer documentation
 ├── docs/landing/           # Landing page (snap.kovina.org)
 ├── .github/ISSUE_TEMPLATE/ # Bug report + feature request templates
 ├── Resources/Lang/         # JSON translation files
-├── Resources/app.ico       # App icon (6-size .ico from master)
+├── Resources/app.ico       # App icon (9-size .ico from master via script)
 ├── *.xaml / *.cs           # WPF app source
+├── scripts/
 ├── *.ps1                   # Build and packaging scripts
 ├── setup.iss               # Inno Setup installer config
 ├── README.md               # GitHub README
