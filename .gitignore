@@ -26,3 +26,6 @@ publish-*/
 release/
 release-*/
 dist/
+GeneratedAssets/
+dist/
+release/
